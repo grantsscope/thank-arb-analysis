@@ -90,7 +90,7 @@ top_performers = data.sort_values(by='Development Activity Index', ascending=Fal
 # Projects with increasing new contributors
 emerging_projects = data[data['New Contributor Count'] > 0].sort_values(by='New Contributor Count', ascending=False).head(5)
 
-st.markdown("#### Key Findings:")
+st.markdown("**Key insights:**")
 # Display summaries of top performers and emerging projects
 st.markdown("- Top 5 Performers based on Development Activity Index: " + 
             ", ".join(top_performers['Project Name'].tolist()) +
@@ -136,7 +136,7 @@ inactive_projects = data[data['Last Commit'] < three_months_ago]
 inactive_projects = inactive_projects.sort_values('Last Commit')
 
 # Display the list of inactive projects
-st.markdown("#### Other notes:")
+st.markdown("**Other notes:**")
 st.error("Projects with no commits in the last 3 months:")
 if not inactive_projects.empty:
     for i, (_, project) in enumerate(inactive_projects.iterrows(), 1):
