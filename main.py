@@ -150,8 +150,9 @@ df_repos = pd.read_csv("./data/repos.csv")
 df_repos['sample_date'] = pd.to_datetime(df_repos['sample_date'])
 df_repos['day'] = df_repos['sample_date'].dt.strftime('%Y-%m-%d')  # Formatting to ensure discrete daily data
 
-# Filter the dataframe for 'active_developers' metric
-df_filtered = df_repos[df_repos['metric_name'] == 'active_developers']
+# Filter for 'active_developers' metric and dates after March 1st, 2024
+df_filtered = df_repos[(df_repos['metric_name'] == 'active_developers') & 
+                       (df_repos['sample_date'] > '2024-03-01')]
 
 # Create the pivot table with the filtered data
 heatmap_data = df_filtered.pivot_table(index='project_name', 
@@ -169,7 +170,6 @@ fig = px.imshow(heatmap_data,
                 x=heatmap_data.columns,
                 y=heatmap_data.index,
                 aspect="auto",  # Changed from "equal" to "auto"
-                title="Day-by-Day Square Heatmap of Active Developers by Project",
                 color_continuous_scale=[
                     [0, "rgb(220,220,220)"],    # Light gray for 0
                     [0.01, "rgb(220,220,220)"], # Light gray for 0
