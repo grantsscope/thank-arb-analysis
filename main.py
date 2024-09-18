@@ -1,19 +1,10 @@
 import streamlit as st
 import pandas as pd
+from st_aggrid import AgGrid, GridOptionsBuilder
+from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 # Set page configuration to wide layout
 st.set_page_config(layout="wide")
-
-# Function to return styled HTML from a DataFrame
-def generate_html_table(dataframe):
-    # Styling the DataFrame and generating HTML
-    styled_df = dataframe.style.apply(
-        lambda x: ['background-color: lightblue' if i % 2 == 0 else 'background-color: white' for i in range(len(x))], axis=1
-    ).set_properties(**{'border': '1px solid black'})
-    
-    # Generating the final HTML
-    html = styled_df.render()
-    return html
 
 def load_data():
     # Load the dataset
@@ -69,7 +60,25 @@ st.text(', '.join(emerging_projects['Project Name'].tolist()))
 
 # Display the dataframe without index
 st.caption("Click on a column name to sort the table.")
-# st.dataframe(data, use_container_width=True, hide_index=True)
-html_table = generate_html_table(data)
-st.markdown(html_table, unsafe_allow_html=True)
 
+# Configure AgGrid
+gb = GridOptionsBuilder.from_dataframe(data)
+gb.configure_default_column(sorteable=True, filterable=True)
+gb.configure_grid_options(domLayout='normal')
+gridOptions = gb.build()
+
+# Custom CSS for alternating row colors
+gridOptions['getRowStyle'] = jscode = JsCode("""
+    function(params) {
+        if (params.node.rowIndex % 2 === 0) {
+            return {'background-color': '#f3f3f3'};
+        }
+    }
+""")
+
+# Display the AgGrid table
+AgGrid(data, 
+       gridOptions=gridOptions, 
+       height=500, 
+       width='100%',
+       theme='streamlit')
