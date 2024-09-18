@@ -144,14 +144,14 @@ else:
     st.markdown("No projects found with last commit dates older than 3 months.")
 
 
-st.markdown("### How is the trend of active developers by project over last 6 months?")
+st.markdown("### Trend Analysis: Full-Time Developer Engagement Over the Past 6 Months")
 df_repos = pd.read_csv("./data/repos.csv")
 
 df_repos['sample_date'] = pd.to_datetime(df_repos['sample_date'])
 df_repos['day'] = df_repos['sample_date'].dt.strftime('%Y-%m-%d')  # Formatting to ensure discrete daily data
 
-# Filter for 'active_developers' metric and dates after March 1st, 2024
-df_filtered = df_repos[(df_repos['metric_name'] == 'active_developers') & 
+# Filter for 'fulltime_developers' metric and dates after March 1st, 2024
+df_filtered = df_repos[(df_repos['metric_name'] == 'fulltime_developers') & 
                        (df_repos['sample_date'] > '2024-03-01')]
 
 # Create the pivot table with the filtered data
