@@ -44,11 +44,11 @@ st.markdown("\n Overall, Thank Arb is helping support: \
             \n - 46 out of 54 projects projects with at least some recent OSS component to their work \
             \n - 662 Github repos \
             \n - 946 contributors")
-st.markdown("\n In the last 6 months, these 46 projects:" \
+
+st.markdown("\n In the last 6 months, these 46 projects: \
             \n - Attracted 134 new contributors \
             \n - Closed over 989 issues (and created 1,191 new ones) \
-            \n - Merged over 1,865 pull requests (and opened 2,281 new ones) \
-            ")
+            \n - Merged over 1,865 pull requests (and opened 2,281 new ones)")
 
 st.markdown("### Profiling based on code metrics in last 6 months")
 st.markdown("Projects are sorted based on their Activity Score. This is a composite metric based on code commits (50%), merged pull requests (30%), and active developer count (20%)")
