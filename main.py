@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 import pytz
 import plotly.express as px
+import plotly.graph_objects as go
 
 # Set page configuration to wide layout
 st.set_page_config(layout="wide")
@@ -142,6 +143,68 @@ if not inactive_projects.empty:
         st.markdown(f"{i}. {project['Project Name']} (Last commit: {project['Last Commit'].strftime('%d-%b-%Y')})")
 else:
     st.markdown("No projects found with last commit dates older than 3 months.")
+
+
+st.markdown("### Project Performance as a measure of Activity Per Developer")
+st.markdown("""
+### Project Activity Efficiency
+
+This chart displays the 'Activity per Developer' ratio for each project. This ratio is calculated by dividing the Development Activity Index by the Active Developer Count.
+
+**What does this mean?**
+- A higher ratio indicates that a project is achieving more activity with fewer active developers, which could suggest higher efficiency or intensity of development work.
+- A lower ratio might indicate projects with larger teams or those with more distributed workloads.
+
+**How to interpret:**
+- Projects at the top of the chart are achieving the highest activity per developer.
+- This metric can help identify projects that are particularly productive relative to their team size.
+- However, it's important to consider this alongside other metrics, as high activity per developer isn't always indicative of overall project health or success.
+
+**Note:** This ratio should be considered alongside other factors such as project complexity, stage of development, and specific project goals.
+""")
+
+# Calculate the ratio
+data['Activity per Developer'] = data['Development Activity Index'] / data['Active Developer Count']
+
+# Sort the data by the ratio in descending order
+sorted_data = data.sort_values('Activity per Developer', ascending=True)
+
+# Create a horizontal bar chart
+fig = go.Figure(go.Bar(
+    y=sorted_data['Project Name'],
+    x=sorted_data['Activity per Developer'],
+    orientation='h',
+    marker_color='lightgreen',
+    text=sorted_data['Activity per Developer'].round(2),  # Display the ratio value on each bar
+    textposition='outside'
+))
+
+# Update the layout
+fig.update_layout(
+    title='Project Activity per Active Developer',
+    xaxis_title='Development Activity Index per Active Developer',
+    yaxis_title='Project Name',
+    height=max(600, len(data) * 25),  # Adjust height based on number of projects
+    width=800
+)
+
+# Display the plot in Streamlit
+st.plotly_chart(fig, use_container_width=True)
+
+# Optionally, display the data table with the new ratio
+columns_to_display.append('Activity per Developer')
+display_data = data[columns_to_display]
+
+st.dataframe(
+    display_data,
+    use_container_width=True,
+    hide_index=True,
+    column_config={
+        "Development Activity Index": st.column_config.NumberColumn(format="%d"),
+        "Activity per Developer": st.column_config.NumberColumn(format="%.2f"),
+    }
+)
+
 
 
 st.markdown("### Trend Analysis: Active Developer Engagement Over the Past 6 Months")
