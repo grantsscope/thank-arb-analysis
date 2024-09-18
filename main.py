@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from st_aggrid import AgGrid, GridOptionsBuilder, JsCode
-from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 # Set page configuration to wide layout
 st.set_page_config(layout="wide")
@@ -65,20 +64,25 @@ st.caption("Click on a column name to sort the table.")
 gb = GridOptionsBuilder.from_dataframe(data)
 gb.configure_default_column(sortable=True, filterable=True)
 gb.configure_grid_options(domLayout='normal')
-gridOptions = gb.build()
 
 # Custom CSS for alternating row colors
-gridOptions['getRowStyle'] = jscode = JsCode("""
+gb.configure_grid_options(
+    getRowStyle=JsCode("""
     function(params) {
         if (params.node.rowIndex % 2 === 0) {
             return {'background-color': '#f3f3f3'};
         }
     }
-""")
+    """)
+)
+
+gridOptions = gb.build()
 
 # Display the AgGrid table
-AgGrid(data, 
-       gridOptions=gridOptions, 
-       height=500, 
-       width='100%',
-       theme='streamlit')
+AgGrid(
+    data, 
+    gridOptions=gridOptions, 
+    height=500, 
+    width='100%',
+    theme='streamlit'
+)
