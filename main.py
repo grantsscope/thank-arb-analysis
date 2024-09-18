@@ -166,7 +166,7 @@ num_projects = len(heatmap_data.index)
 
 # Creating the heatmap with custom color scale and adjusted height
 fig = px.imshow(heatmap_data,
-                labels=dict(x="Day", y="Project", color="Number of Active Developers"),
+                labels=dict(x="Day", y="Project", color="Number of Active Developers across Project Repositories"),
                 x=heatmap_data.columns,
                 y=heatmap_data.index,
                 aspect="auto",  # Changed from "equal" to "auto"
