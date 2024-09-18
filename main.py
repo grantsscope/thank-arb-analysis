@@ -21,7 +21,12 @@ def load_data():
         'merged_pull_request_count_6_months': 'Merged Pull Request Count',
         'active_developer_count_6_months': 'Active Developer Count',
         'contributor_count_6_months': 'Contributor Count',
-        'new_contributor_count_6_months': 'New Contributor Count'
+        'new_contributor_count_6_months': 'New Contributor Count',
+        'opened_pull_request_count_6_months': '# of Open PRs',	
+        'merged_pull_request_count_6_months': '# of Merged PRs',
+        'opened_issue_count_6_months': '# of Issues Opened',
+        'closed_issue_count_6_months': '# of Issues Closed'
+
     })
 
     columns = [
@@ -44,17 +49,24 @@ st.markdown("This analysis focuses on a list of 54 projects uploaded in the [Tha
 # Load data
 data = load_data()
 
+project_count = len(data)
 total_repos = data['Repository Count'].sum()
+total_contributors = data['Contributor Count'].sum()
+new_contributors = data['New Contributor Count'].sum()
+total_open_PR = data['# of Open PRs'].sum()
+total_merged_PR = data['# of Merged PRs'].sum()
+total_issues_opened = data['# of Issues Opened'].sum()
+total_issues_closed = data['# of Issues Closed'].sum()
 
-st.markdown("\n Overall, Thank Arb is helping support: \
-            \n - 46 out of 54 projects projects with at least some recent OSS component to their work \
+st.markdown(f"\n Overall, Thank Arb is helping support: \
+            \n - {project_count} out of 54 projects projects with at least some recent OSS component to their work \
             \n - {total_repos:,} Github repos \
-            \n - 946 contributors")
+            \n - {total_contributors:,} contributors")
 
-st.markdown("\n In the last 6 months, these 46 projects: \
-            \n - Attracted 134 new contributors \
-            \n - Closed over 989 issues (and created 1,191 new ones) \
-            \n - Merged over 1,865 pull requests (and opened 2,281 new ones)")
+st.markdown(f"\n In the last 6 months, these {project_count} projects: \
+            \n - Attracted {new_contributors:,} new contributors \
+            \n - Closed over {total_issues_closed:,} issues (and created {total_issues_opened:,} new ones) \
+            \n - Merged over {total_merged_PR:,} pull requests (and opened {total_open_PR:,} new ones)")
 
 st.markdown("### Profiling based on code metrics in last 6 months")
 st.markdown("Projects are sorted based on their Activity Score. This is a composite metric based on code commits (50%), merged pull requests (30%), and active developer count (20%)")
