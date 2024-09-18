@@ -47,7 +47,7 @@ st.markdown("- 46 out of 54 projects projects with at least some recent OSS comp
 st.markdown("In the last 6 months, these 46 projects:")
 st.markdown("- Attracted 134 new contributors \
             - Closed over 989 issues (and created 1,191 new ones) \
-            - Merged over 1,865 pull requests (and opened 2,281 new ones)
+            - Merged over 1,865 pull requests (and opened 2,281 new ones) \
             ")
 
 st.markdown("### Profiling based on code metrics in last 6 months")
