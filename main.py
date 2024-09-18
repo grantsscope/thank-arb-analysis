@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 
+# Set page configuration to wide layout
+st.set_page_config(layout="wide")
+
 def load_data():
     # Load the dataset
     df = pd.read_csv("./data/project_metrics.csv")
@@ -39,5 +42,5 @@ st.markdown("Projects are sorted based on their Activity Score. This is a compos
 # Load data
 data = load_data()
 
-# Display the dataframe
-st.dataframe(data)
+# Display the dataframe without index
+st.dataframe(data, use_container_width=True, index=False)
