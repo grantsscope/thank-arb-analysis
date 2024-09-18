@@ -186,6 +186,7 @@ fig.update_layout(
         tickvals=[0, 1.5, 4, 8, 11],
         ticktext=["0", "1-2", "3-5", "6-10", "11+"]
     )
+    height=1600
 )
 fig.update_xaxes(side="top")
 
