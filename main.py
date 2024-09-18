@@ -37,6 +37,9 @@ def load_data():
 # Set up the Streamlit interface
 st.title("Thank Arb Impact Analysis")
 
+st.markdown("This analysis focuses on a list of 54 projects uploaded in the [Thank Arb Grantee Collection](https://github.com/opensource-observer/oss-directory/blob/main/data/collections/thank-arb-grantees.yaml) \
+            in OSO Directory. Note that this is a static data extracted as of September 18th, 2024. Refer [this](https://docs.google.com/spreadsheets/d/1Ka6x8GKcBNf1kmic2AjJMEeo7aGN8PBO3phvKcCW1hk/edit?gid=1301894510#gid=1301894510) spreadsheet for the coverage of artifacts for each projects used in this analysis.")
+
 st.markdown("### Profiling based on code metrics in last 6 months")
 st.markdown("Projects are sorted based on their Activity Score. This is a composite metric based on code commits (50%), merged pull requests (30%), and active developer count (20%)")
 
