@@ -39,8 +39,17 @@ st.title("Thank Arb Impact Analysis")
 
 st.markdown("### Profiling based on code metrics in last 6 months")
 st.markdown("Projects are sorted based on their Activity Score. This is a composite metric based on code commits (50%), merged pull requests (30%), and active developer count (20%)")
+st.caption("Click on a column name to sort the table.")
 # Load data
 data = load_data()
+
+# Analyze top performers
+top_performers = data.sort_values(by='Activity Score', ascending=False).head(5)
+
+# Projects with increasing new contributors
+emerging_projects = data[data['new_contributor_count_6_months'] > 0].sort_values(by='new_contributor_count_6_months', ascending=False).head(5)
+print("Top Performers:\n", top_performers[['display_name', 'Activity Score']])
+print("Emerging Projects:\n", emerging_projects[['display_name', 'new_contributor_count_6_months']])
 
 # Display the dataframe without index
 st.dataframe(data, use_container_width=True, hide_index=False)
