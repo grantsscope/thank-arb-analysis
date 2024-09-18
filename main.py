@@ -50,13 +50,13 @@ st.markdown("This analysis focuses on a list of 54 projects uploaded in the [Tha
 data = load_data()
 
 project_count = len(data)
-total_repos = data['Repository Count'].sum()
-total_contributors = data['Contributor Count'].sum()
-new_contributors = data['New Contributor Count'].sum()
-total_open_PR = data['# of Open PRs'].sum()
-total_merged_PR = data['# of Merged PRs'].sum()
-total_issues_opened = data['# of Issues Opened'].sum()
-total_issues_closed = data['# of Issues Closed'].sum()
+total_repos = round(data['Repository Count'].sum())
+total_contributors = round(data['Contributor Count'].sum())
+new_contributors = round(data['New Contributor Count'].sum())
+total_open_PR = round(data['# of Open PRs'].sum())
+total_merged_PR = round(data['# of Merged PRs'].sum())
+total_issues_opened = round(data['# of Issues Opened'].sum())
+total_issues_closed = round(data['# of Issues Closed'].sum())
 
 st.markdown(f"\n Overall, Thank Arb is helping support: \
             \n - {project_count} out of 54 projects projects with at least some recent OSS component to their work \
