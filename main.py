@@ -41,9 +41,9 @@ def load_data():
     return df[columns]
 
 # Set up the Streamlit interface
-st.title("Thank Arb Impact Analysis - DRAFT")
+st.title("Thank ARB Impact Analysis - DRAFT")
 
-st.markdown("This analysis focuses on a list of 54 projects uploaded in the [Thank Arb Grantee Collection](https://github.com/opensource-observer/oss-directory/blob/main/data/collections/thank-arb-grantees.yaml) \
+st.markdown("This analysis focuses on a list of 54 projects uploaded in the [Thank ARB Grantee Collection](https://github.com/opensource-observer/oss-directory/blob/main/data/collections/thank-arb-grantees.yaml) \
             in OSO Directory. Note that this is a static data extracted as of September 18th, 2024. Refer [this](https://docs.google.com/spreadsheets/d/1Ka6x8GKcBNf1kmic2AjJMEeo7aGN8PBO3phvKcCW1hk/edit?gid=1301894510#gid=1301894510) spreadsheet for the coverage of artifacts for each projects used in this analysis.")
 
 # Load data
@@ -58,7 +58,7 @@ total_merged_PR = round(data['# of Merged PRs'].sum())
 total_issues_opened = round(data['# of Issues Opened'].sum())
 total_issues_closed = round(data['# of Issues Closed'].sum())
 
-st.markdown(f"\n Overall, Thank Arb is helping support: \
+st.markdown(f"\n Overall, Thank ARB is helping support: \
             \n - {project_count} out of 54 projects projects with at least some recent OSS component to their work \
             \n - {total_repos:,} Github repos \
             \n - {total_contributors:,} contributors")
