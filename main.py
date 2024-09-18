@@ -6,10 +6,14 @@ st.set_page_config(layout="wide")
 
 # Function to return styled HTML from a DataFrame
 def generate_html_table(dataframe):
-    styled_df = dataframe.style.applymap(lambda x: 'background-color: lightgrey', subset=['Name'])\
-                                .apply(lambda x: ['background-color: lightblue' if i % 2 == 0 else 'background-color: white' for i in range(len(x))], axis=1)\
-                                .hide_index()
-    return styled_df.render()
+    # Styling the DataFrame and generating HTML
+    styled_df = dataframe.style.apply(
+        lambda x: ['background-color: lightblue' if i % 2 == 0 else 'background-color: white' for i in range(len(x))], axis=1
+    ).set_properties(**{'border': '1px solid black'}).hide_index()
+    
+    # Generating the final HTML
+    html = styled_df.render()
+    return html
 
 def load_data():
     # Load the dataset
