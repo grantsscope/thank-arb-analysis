@@ -137,7 +137,7 @@ inactive_projects = inactive_projects.sort_values('Last Commit')
 
 # Display the list of inactive projects
 st.markdown("#### Other notes:")
-st.markdown("- Projects with no commits in the last 3 months:")
+st.warning("Projects with no commits in the last 3 months:")
 if not inactive_projects.empty:
     for i, (_, project) in enumerate(inactive_projects.iterrows(), 1):
         st.markdown(f"{i}. {project['Project Name']} (Last commit: {project['Last Commit'].strftime('%d-%b-%Y')})")
