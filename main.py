@@ -4,6 +4,13 @@ import pandas as pd
 # Set page configuration to wide layout
 st.set_page_config(layout="wide")
 
+# Function to return styled HTML from a DataFrame
+def generate_html_table(dataframe):
+    styled_df = dataframe.style.applymap(lambda x: 'background-color: lightgrey', subset=['Name'])\
+                                .apply(lambda x: ['background-color: lightblue' if i % 2 == 0 else 'background-color: white' for i in range(len(x))], axis=1)\
+                                .hide_index()
+    return styled_df.render()
+
 def load_data():
     # Load the dataset
     df = pd.read_csv("./data/project_metrics.csv")
@@ -58,4 +65,7 @@ st.text(', '.join(emerging_projects['Project Name'].tolist()))
 
 # Display the dataframe without index
 st.caption("Click on a column name to sort the table.")
-st.dataframe(data, use_container_width=True, hide_index=False)
+# st.dataframe(data, use_container_width=True, hide_index=True)
+html_table = generate_html_table(data)
+st.markdown(html_table, unsafe_allow_html=True)
+
