@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from st_aggrid import AgGrid, GridOptionsBuilder
+from st_aggrid import AgGrid, GridOptionsBuilder, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 # Set page configuration to wide layout
@@ -63,7 +63,7 @@ st.caption("Click on a column name to sort the table.")
 
 # Configure AgGrid
 gb = GridOptionsBuilder.from_dataframe(data)
-gb.configure_default_column(sorteable=True, filterable=True)
+gb.configure_default_column(sortable=True, filterable=True)
 gb.configure_grid_options(domLayout='normal')
 gridOptions = gb.build()
 
