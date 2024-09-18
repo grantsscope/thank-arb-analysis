@@ -89,6 +89,7 @@ top_performers = data.sort_values(by='Development Activity Index', ascending=Fal
 # Projects with increasing new contributors
 emerging_projects = data[data['New Contributor Count'] > 0].sort_values(by='New Contributor Count', ascending=False).head(5)
 
+st.markdown("### Key Findings:")
 # Display summaries of top performers and emerging projects
 st.markdown("- Top 5 Performers based on Development Activity Index: " + 
             ", ".join(top_performers['Project Name'].tolist()) +
