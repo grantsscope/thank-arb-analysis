@@ -18,7 +18,6 @@ def load_data():
         'display_name': 'Project Name',
         'repository_count': 'Repository Count',
         'commit_count_6_months': 'Commit Count',
-        'merged_pull_request_count_6_months': 'Merged Pull Request Count',
         'active_developer_count_6_months': 'Active Developer Count',
         'contributor_count_6_months': 'Contributor Count',
         'new_contributor_count_6_months': 'New Contributor Count',
@@ -30,10 +29,9 @@ def load_data():
     })
 
     columns = [
-        'Project Name', 'Activity Score', 'Commit Count', 
-        'Merged Pull Request Count', 'Active Developer Count', 
+        'Project Name', 'Activity Score', 'Commit Count', 'Active Developer Count', '# of Merged PRs',
         'Contributor Count', 'New Contributor Count', 'Repository Count',
-        '# of Open PRs', '# of Merged PRs',
+        '# of Open PRs', 
         '# of Issues Opened', '# of Issues Closed'
     ]
     
