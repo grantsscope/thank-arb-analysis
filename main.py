@@ -25,7 +25,10 @@ def load_data():
         'Merged Pull Request Count', 'Active Developer Count', 
         'Contributor Count', 'New Contributor Count'
     ]
-
+    
+    # Sort by Activity Score in descending order
+    df = df[columns].sort_values(by='Activity Score', ascending=False)
+    
     return df[columns]
 
 # Set up the Streamlit interface
