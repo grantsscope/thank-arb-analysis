@@ -47,9 +47,9 @@ data = load_data()
 top_performers = data.sort_values(by='Activity Score', ascending=False).head(5)
 
 # Projects with increasing new contributors
-emerging_projects = data[data['new_contributor_count_6_months'] > 0].sort_values(by='new_contributor_count_6_months', ascending=False).head(5)
-print("Top Performers:\n", top_performers[['display_name', 'Activity Score']])
-print("Emerging Projects:\n", emerging_projects[['display_name', 'new_contributor_count_6_months']])
+emerging_projects = data[data['New Contributor Count'] > 0].sort_values(by='New Contributor Count', ascending=False).head(5)
+print("Top Performers:\n", top_performers[['Project Name', 'Activity Score']])
+print("Emerging Projects:\n", emerging_projects[['Project Name', 'New Contributor Count']])
 
 # Display the dataframe without index
 st.dataframe(data, use_container_width=True, hide_index=False)
