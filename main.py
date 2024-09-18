@@ -59,14 +59,6 @@ st.text(', '.join(emerging_projects['Project Name'].tolist()))
 # Display the dataframe without index
 st.caption("Click on a column name to sort the table.")
 
-# Add custom CSS
-st.markdown("""
-<style>
-    .stDataFrame {
-        background-color: #f0f2f6;
-    }
-</style>
-""", unsafe_allow_html=True)
 
 # Display the dataframe
 st.dataframe(
@@ -74,6 +66,6 @@ st.dataframe(
     use_container_width=True,
     hide_index=True,
     column_config={
-        "Activity Score": st.column_config.NumberColumn(format="%.2f"),
+        "Activity Score": st.column_config.NumberColumn(format="%d"),
     }
 )
