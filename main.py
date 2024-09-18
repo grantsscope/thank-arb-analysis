@@ -98,21 +98,6 @@ st.markdown("- Top 5 Performers based on Development Activity Index: " +
 # Calculate the date 3 months ago from today in UTC
 three_months_ago = datetime.now(pytz.UTC) - timedelta(days=90)
 
-# Convert 'Last Commit' to datetime and filter projects
-data['Last Commit'] = pd.to_datetime(data['Last Commit'], format='%Y-%m-%d %H:%M:%S%z')
-inactive_projects = data[data['Last Commit'] < three_months_ago]
-
-# Sort inactive projects by last commit date
-inactive_projects = inactive_projects.sort_values('Last Commit')
-
-# Display the list of inactive projects
-st.markdown("- Projects with no commits in the last 3 months:")
-if not inactive_projects.empty:
-    for _, project in inactive_projects.iterrows():
-        st.markdown(f"    - {project['Project Name']} (Last commit: {project['Last Commit'].strftime('%d-%b-%Y')})")
-else:
-    st.markdown("No projects found with last commit dates older than 3 months.")
-
 
 # Display the dataframe without index
 st.caption("Click on a column name to sort the table.")
@@ -140,3 +125,19 @@ st.dataframe(
         "Development Activity Index": st.column_config.NumberColumn(format="%d"),
     }
 )
+
+# Convert 'Last Commit' to datetime and filter projects
+data['Last Commit'] = pd.to_datetime(data['Last Commit'], format='%Y-%m-%d %H:%M:%S%z')
+inactive_projects = data[data['Last Commit'] < three_months_ago]
+
+# Sort inactive projects by last commit date
+inactive_projects = inactive_projects.sort_values('Last Commit')
+
+# Display the list of inactive projects
+st.markdown("#### Other notes:")
+st.markdown("- Projects with no commits in the last 3 months:")
+if not inactive_projects.empty:
+    for i, (_, project) in enumerate(inactive_projects.iterrows(), 1):
+        st.markdown(f"{i}. {project['Project Name']} (Last commit: {project['Last Commit'].strftime('%d-%b-%Y')})")
+else:
+    st.markdown("No projects found with last commit dates older than 3 months.")
