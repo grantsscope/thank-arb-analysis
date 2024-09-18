@@ -109,7 +109,7 @@ inactive_projects = inactive_projects.sort_values('Last Commit')
 st.markdown("- Projects with no commits in the last 3 months:")
 if not inactive_projects.empty:
     for _, project in inactive_projects.iterrows():
-        st.markdown(f"- {project['Project Name']} (Last commit: {project['Last Commit'].strftime('%d-%b-%Y')})")
+        st.markdown(f"    - {project['Project Name']} (Last commit: {project['Last Commit'].strftime('%d-%b-%Y')})")
 else:
     st.markdown("No projects found with last commit dates older than 3 months.")
 
