@@ -98,7 +98,8 @@ st.markdown("- Top 5 Performers based on Development Activity Index: " +
 # Calculate the date 3 months ago from today in UTC
 three_months_ago = datetime.now(pytz.UTC) - timedelta(days=90)
 
-# Filter projects with last commit dates older than 3 months
+# Convert 'Last Commit' to datetime and filter projects
+data['Last Commit'] = pd.to_datetime(data['Last Commit'], format='%Y-%m-%d %H:%M:%S%z')
 inactive_projects = data[data['Last Commit'] < three_months_ago]
 
 # Sort inactive projects by last commit date
