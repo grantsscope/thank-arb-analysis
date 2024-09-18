@@ -145,7 +145,6 @@ else:
     st.markdown("No projects found with last commit dates older than 3 months.")
 
 
-st.markdown("### Project Performance as a measure of Activity Per Developer")
 st.markdown("""
 ### Project Activity Efficiency
 
@@ -159,9 +158,10 @@ This chart displays the 'Activity per Developer' ratio for each project. This ra
 - Projects at the top of the chart are achieving the highest activity per developer.
 - This metric can help identify projects that are particularly productive relative to their team size.
 - However, it's important to consider this alongside other metrics, as high activity per developer isn't always indicative of overall project health or success.
-
-**Note:** This ratio should be considered alongside other factors such as project complexity, stage of development, and specific project goals.
 """)
+
+st.info("**Note:** This ratio should be considered alongside other factors such as project complexity, stage of development, and specific project goals.")
+
 
 # Calculate the ratio
 data['Activity per Developer'] = data['Development Activity Index'] / data['Active Developer Count']
