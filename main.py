@@ -48,8 +48,13 @@ top_performers = data.sort_values(by='Activity Score', ascending=False).head(5)
 
 # Projects with increasing new contributors
 emerging_projects = data[data['New Contributor Count'] > 0].sort_values(by='New Contributor Count', ascending=False).head(5)
-print("Top Performers:\n", top_performers[['Project Name', 'Activity Score']])
-print("Emerging Projects:\n", emerging_projects[['Project Name', 'New Contributor Count']])
+
+# Display summaries of top performers and emerging projects
+st.subheader("Top 5 Performers based on Activity Score")
+st.text(', '.join(top_performers['Project Name'].tolist()))
+
+st.subheader("Top 5 Emerging Projects (by New Contributors)")
+st.text(', '.join(emerging_projects['Project Name'].tolist()))
 
 # Display the dataframe without index
 st.dataframe(data, use_container_width=True, hide_index=False)
