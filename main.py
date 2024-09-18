@@ -40,12 +40,12 @@ st.title("Thank Arb Impact Analysis")
 st.markdown("This analysis focuses on a list of 54 projects uploaded in the [Thank Arb Grantee Collection](https://github.com/opensource-observer/oss-directory/blob/main/data/collections/thank-arb-grantees.yaml) \
             in OSO Directory. Note that this is a static data extracted as of September 18th, 2024. Refer [this](https://docs.google.com/spreadsheets/d/1Ka6x8GKcBNf1kmic2AjJMEeo7aGN8PBO3phvKcCW1hk/edit?gid=1301894510#gid=1301894510) spreadsheet for the coverage of artifacts for each projects used in this analysis.")
 
-st.markdown("\n Overall, Thank Arb is helping support:")
-st.markdown("- 46 out of 54 projects projects with at least some recent OSS component to their work")
-st.markdown("- 662 Github repos")
-st.markdown("- 946 contributors")
-st.markdown("\n In the last 6 months, these 46 projects:")
-st.markdown("- Attracted 134 new contributors \
+st.markdown("\n Overall, Thank Arb is helping support: \
+            \n - 46 out of 54 projects projects with at least some recent OSS component to their work \
+            \n - 662 Github repos \
+            \n - 946 contributors")
+st.markdown("\n In the last 6 months, these 46 projects:" \
+            \n - Attracted 134 new contributors \
             \n - Closed over 989 issues (and created 1,191 new ones) \
             \n - Merged over 1,865 pull requests (and opened 2,281 new ones) \
             ")
