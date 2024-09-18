@@ -94,20 +94,20 @@ st.markdown("- Top 5 Performers based on Development Activity Index: " +
             "\n - Top 5 Emerging Projects (by New Contributors): " + 
             ", ".join(emerging_projects['Project Name'].tolist()))
 
-# Calculate the date 3 months ago from today
-three_months_ago = datetime.now() - timedelta(days=90)
+# Calculate the date 3 months ago from today in UTC
+three_months_ago = datetime.now(pytz.UTC) - timedelta(days=90)
 
 # Filter projects with last commit dates older than 3 months
-inactive_projects = data[pd.to_datetime(data['Last Commit']) < three_months_ago]
+inactive_projects = data[data['Last Commit'] < three_months_ago]
 
 # Sort inactive projects by last commit date
 inactive_projects = inactive_projects.sort_values('Last Commit')
 
 # Display the list of inactive projects
-st.markdown("- Projects with no commits in the last 3 months:")
+st.markdown("### Projects with no commits in the last 3 months:")
 if not inactive_projects.empty:
     for _, project in inactive_projects.iterrows():
-        st.markdown(f"- {project['Project Name']} (Last commit: {project['Last Commit']})")
+        st.markdown(f"- {project['Project Name']} (Last commit: {project['Last Commit'].strftime('%Y-%m-%d')})")
 else:
     st.markdown("No projects found with last commit dates older than 3 months.")
 
