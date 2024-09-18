@@ -24,15 +24,15 @@ def load_data():
         'opened_pull_request_count_6_months': '# of Open PRs',	
         'merged_pull_request_count_6_months': '# of Merged PRs',
         'opened_issue_count_6_months': '# of Issues Opened',
-        'closed_issue_count_6_months': '# of Issues Closed'
-
+        'closed_issue_count_6_months': '# of Issues Closed',
+        'last_commit_date': 'Last Commit'
     })
 
     columns = [
         'Project Name', 'Development Activity Index', 'Commit Count', 'Active Developer Count', '# of Merged PRs',
         'Contributor Count', 'New Contributor Count', 'Repository Count',
         '# of Open PRs', 
-        '# of Issues Opened', '# of Issues Closed'
+        '# of Issues Opened', '# of Issues Closed', 'Last Commit'
     ]
     
     # Sort by Development Activity Index in descending order
@@ -92,6 +92,24 @@ st.markdown("- Top 5 Performers based on Development Activity Index: " +
             ", ".join(top_performers['Project Name'].tolist()) +
             "\n - Top 5 Emerging Projects (by New Contributors): " + 
             ", ".join(emerging_projects['Project Name'].tolist()))
+
+# Calculate the date 3 months ago from today
+three_months_ago = datetime.now() - timedelta(days=90)
+
+# Filter projects with last commit dates older than 3 months
+inactive_projects = data[pd.to_datetime(data['Last Commit']) < three_months_ago]
+
+# Sort inactive projects by last commit date
+inactive_projects = inactive_projects.sort_values('Last Commit')
+
+# Display the list of inactive projects
+st.markdown("- Projects with no commits in the last 3 months:")
+if not inactive_projects.empty:
+    for _, project in inactive_projects.iterrows():
+        st.markdown(f"- {project['Project Name']} (Last commit: {project['Last Commit']})")
+else:
+    st.markdown("No projects found with last commit dates older than 3 months.")
+
 
 # Display the dataframe without index
 st.caption("Click on a column name to sort the table.")
