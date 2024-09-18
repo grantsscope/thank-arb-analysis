@@ -68,9 +68,8 @@ st.markdown(f"\n In the last 6 months, these {project_count} projects: \
             \n - Closed over {total_issues_closed:,} issues (and created {total_issues_opened:,} new ones) \
             \n - Merged over {total_merged_PR:,} pull requests (and opened {total_open_PR:,} new ones)")
 
-st.markdown("### What are the top projects based on coding activities?")
+st.markdown("### What are the top projects based on development activities?")
 st.markdown("""
-### Project Activity Analysis
 Projects are ranked according to their Development Activity Index, a composite metric derived from:
 - **Code Commits** (50%)
 - **Merged Pull Requests** (30%)
@@ -80,7 +79,7 @@ This metric helps quantify and compare the development activity across projects.
 """)
 
 st.info("""
-**Note on Development Activity Index:** The Development Activity Index is a custom composite metric tailored to reflect project engagement. Depending on grant objectives, different combinations of metrics might be employed to more accurately evaluate grantee performance.
+**Note on Development Activity Index:** The Development Activity Index is a custom composite metric tailored to reflect coding activities. Depending on grant objectives, different combinations of metrics might be employed to more accurately evaluate grantee performance.
 """)
 
 
@@ -91,11 +90,12 @@ top_performers = data.sort_values(by='Development Activity Index', ascending=Fal
 emerging_projects = data[data['New Contributor Count'] > 0].sort_values(by='New Contributor Count', ascending=False).head(5)
 
 # Display summaries of top performers and emerging projects
-st.markdown("- Top 5 Performers based on Development Activity Index")
-st.text(', '.join(top_performers['Project Name'].tolist()))
+st.markdown("- Top 5 Performers based on Development Activity Index: " + 
+            ", ".join(top_performers['Project Name'].tolist()))
 
-st.markdown("- Top 5 Emerging Projects (by New Contributors)")
-st.text(', '.join(emerging_projects['Project Name'].tolist()))
+
+st.markdown("- Top 5 Emerging Projects (by New Contributors)" + 
+            ", ".join(emerging_projects['Project Name'].tolist()))
 
 # Display the dataframe without index
 st.caption("Click on a column name to sort the table.")
