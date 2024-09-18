@@ -91,10 +91,8 @@ emerging_projects = data[data['New Contributor Count'] > 0].sort_values(by='New 
 
 # Display summaries of top performers and emerging projects
 st.markdown("- Top 5 Performers based on Development Activity Index: " + 
-            ", ".join(top_performers['Project Name'].tolist()))
-
-
-st.markdown("- Top 5 Emerging Projects (by New Contributors)" + 
+            ", ".join(top_performers['Project Name'].tolist()) +
+            "\n - Top 5 Emerging Projects (by New Contributors): " + 
             ", ".join(emerging_projects['Project Name'].tolist()))
 
 # Display the dataframe without index
