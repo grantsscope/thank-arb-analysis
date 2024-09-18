@@ -160,12 +160,15 @@ heatmap_data = df_filtered.pivot_table(index='project_name',
                                        aggfunc='sum', 
                                        fill_value=0)
 
-# Creating the heatmap with custom color scale
+# Calculate the number of projects (rows) in your heatmap
+num_projects = len(heatmap_data.index)
+
+# Creating the heatmap with custom color scale and adjusted height
 fig = px.imshow(heatmap_data,
                 labels=dict(x="Day", y="Project", color="Number of Active Developers"),
                 x=heatmap_data.columns,
                 y=heatmap_data.index,
-                aspect="equal",
+                aspect="auto",  # Changed from "equal" to "auto"
                 title="Day-by-Day Square Heatmap of Active Developers by Project",
                 color_continuous_scale=[
                     [0, "rgb(220,220,220)"],    # Light gray for 0
@@ -178,7 +181,7 @@ fig = px.imshow(heatmap_data,
                 zmin=0,
                 zmax=11)
 
-# Update the layout to ensure squares and add color bar ticks
+# Update the layout to ensure proper sizing
 fig.update_layout(
     xaxis={'type': 'category'},
     yaxis={'type': 'category'},
@@ -186,7 +189,9 @@ fig.update_layout(
         tickvals=[0, 1.5, 4, 8, 11],
         ticktext=["0", "1-2", "3-5", "6-10", "11+"]
     ),
-    height=1600
+    height=max(600, num_projects * 20),  # Adjust height based on number of projects
+    width=800,  # Adjust width as needed
+    yaxis_nticks=num_projects  # Ensure all project names are shown
 )
 fig.update_xaxes(side="top")
 
