@@ -74,14 +74,11 @@ Projects are ranked according to their Development Activity Index, a composite m
 - **Code Commits** (50%)
 - **Merged Pull Requests** (30%)
 - **Active Developer Count** (20%)
-
-This metric helps quantify and compare the development activity across projects.
 """)
 
 st.info("""
-**Note on Development Activity Index:** The Development Activity Index is a custom composite metric tailored to reflect coding activities. Depending on grant objectives, different combinations of metrics might be employed to more accurately evaluate grantee performance.
+**Note on Development Activity Index:** The Development Activity Index is a proposed custom composite metric tailored to reflect coding activities. Depending on grant objectives, different combinations of metrics might be employed to more accurately evaluate grantee performance.
 """)
-
 
 # Analyze top performers
 top_performers = data.sort_values(by='Development Activity Index', ascending=False).head(5)
@@ -89,7 +86,7 @@ top_performers = data.sort_values(by='Development Activity Index', ascending=Fal
 # Projects with increasing new contributors
 emerging_projects = data[data['New Contributor Count'] > 0].sort_values(by='New Contributor Count', ascending=False).head(5)
 
-st.markdown("### Key Findings:")
+st.markdown("#### Key Findings:")
 # Display summaries of top performers and emerging projects
 st.markdown("- Top 5 Performers based on Development Activity Index: " + 
             ", ".join(top_performers['Project Name'].tolist()) +
@@ -99,10 +96,23 @@ st.markdown("- Top 5 Performers based on Development Activity Index: " +
 # Display the dataframe without index
 st.caption("Click on a column name to sort the table.")
 
+# Define the columns you want to display and their order
+columns_to_display = [
+    'Project Name', 
+    'Development Activity Index', 
+    'Commit Count', 
+    '# of Merged PRs',
+    'Active Developer Count', 
+    'Contributor Count', 
+    'New Contributor Count'
+]
+
+# Create a new dataframe with only the selected columns
+display_data = data[columns_to_display]
 
 # Display the dataframe
 st.dataframe(
-    data,
+    display_data,
     use_container_width=True,
     hide_index=True,
     column_config={
