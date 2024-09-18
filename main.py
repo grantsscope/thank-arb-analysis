@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-from st_aggrid import AgGrid, GridOptionsBuilder, JsCode
 
 # Set page configuration to wide layout
 st.set_page_config(layout="wide")
@@ -60,29 +59,21 @@ st.text(', '.join(emerging_projects['Project Name'].tolist()))
 # Display the dataframe without index
 st.caption("Click on a column name to sort the table.")
 
-# Configure AgGrid
-gb = GridOptionsBuilder.from_dataframe(data)
-gb.configure_default_column(sortable=True, filterable=True)
-gb.configure_grid_options(domLayout='normal')
-
-# Custom CSS for alternating row colors
-gb.configure_grid_options(
-    getRowStyle=JsCode("""
-    function(params) {
-        if (params.node.rowIndex % 2 === 0) {
-            return {'background-color': '#f3f3f3'};
-        }
+# Add custom CSS
+st.markdown("""
+<style>
+    .stDataFrame {
+        background-color: #f0f2f6;
     }
-    """)
-)
+</style>
+""", unsafe_allow_html=True)
 
-gridOptions = gb.build()
-
-# Display the AgGrid table
-AgGrid(
-    data, 
-    gridOptions=gridOptions, 
-    height=500, 
-    width='100%',
-    theme='streamlit'
+# Display the dataframe
+st.dataframe(
+    data,
+    use_container_width=True,
+    hide_index=True,
+    column_config={
+        "Activity Score": st.column_config.NumberColumn(format="%.2f"),
+    }
 )
