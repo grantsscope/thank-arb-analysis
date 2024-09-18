@@ -8,8 +8,8 @@ def load_data():
     # Load the dataset
     df = pd.read_csv("./data/project_metrics.csv")
     
-    # Calculate the Activity Score
-    df['Activity Score'] = (df['commit_count_6_months'] * 0.5) + \
+    # Calculate the Development Activity Index
+    df['Development Activity Index'] = (df['commit_count_6_months'] * 0.5) + \
                            (df['merged_pull_request_count_6_months'] * 0.3) + \
                            (df['active_developer_count_6_months'] * 0.2)
     
@@ -29,14 +29,14 @@ def load_data():
     })
 
     columns = [
-        'Project Name', 'Activity Score', 'Commit Count', 'Active Developer Count', '# of Merged PRs',
+        'Project Name', 'Development Activity Index', 'Commit Count', 'Active Developer Count', '# of Merged PRs',
         'Contributor Count', 'New Contributor Count', 'Repository Count',
         '# of Open PRs', 
         '# of Issues Opened', '# of Issues Closed'
     ]
     
-    # Sort by Activity Score in descending order
-    df = df[columns].sort_values(by='Activity Score', ascending=False)
+    # Sort by Development Activity Index in descending order
+    df = df[columns].sort_values(by='Development Activity Index', ascending=False)
     
     return df[columns]
 
@@ -71,7 +71,7 @@ st.markdown(f"\n In the last 6 months, these {project_count} projects: \
 st.markdown("### What are the top projects based on coding activities?")
 st.markdown("""
 ### Project Activity Analysis
-Projects are ranked according to their Activity Score, a composite metric derived from:
+Projects are ranked according to their Development Activity Index, a composite metric derived from:
 - **Code Commits** (50%)
 - **Merged Pull Requests** (30%)
 - **Active Developer Count** (20%)
@@ -80,18 +80,18 @@ This metric helps quantify and compare the development activity across projects.
 """)
 
 st.info("""
-**Note on Activity Score:** The Activity Score is a custom composite metric tailored to reflect project engagement. Depending on grant objectives, different combinations of metrics might be employed to more accurately evaluate grantee performance.
+**Note on Development Activity Index:** The Development Activity Index is a custom composite metric tailored to reflect project engagement. Depending on grant objectives, different combinations of metrics might be employed to more accurately evaluate grantee performance.
 """)
 
 
 # Analyze top performers
-top_performers = data.sort_values(by='Activity Score', ascending=False).head(5)
+top_performers = data.sort_values(by='Development Activity Index', ascending=False).head(5)
 
 # Projects with increasing new contributors
 emerging_projects = data[data['New Contributor Count'] > 0].sort_values(by='New Contributor Count', ascending=False).head(5)
 
 # Display summaries of top performers and emerging projects
-st.markdown("- Top 5 Performers based on Activity Score")
+st.markdown("- Top 5 Performers based on Development Activity Index")
 st.text(', '.join(top_performers['Project Name'].tolist()))
 
 st.markdown("- Top 5 Emerging Projects (by New Contributors)")
@@ -107,6 +107,6 @@ st.dataframe(
     use_container_width=True,
     hide_index=True,
     column_config={
-        "Activity Score": st.column_config.NumberColumn(format="%d"),
+        "Development Activity Index": st.column_config.NumberColumn(format="%d"),
     }
 )
