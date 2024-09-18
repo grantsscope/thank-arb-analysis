@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 import pytz
+import plotly.express as px
 
 # Set page configuration to wide layout
 st.set_page_config(layout="wide")
@@ -141,3 +142,51 @@ if not inactive_projects.empty:
         st.markdown(f"{i}. {project['Project Name']} (Last commit: {project['Last Commit'].strftime('%d-%b-%Y')})")
 else:
     st.markdown("No projects found with last commit dates older than 3 months.")
+
+
+st.markdown("### What are the top projects based on development activities?")
+df_repos = pd.read_csv("./data/repos.csv")
+
+df_repos['sample_date'] = pd.to_datetime(df_repos['sample_date'])
+df_repos['day'] = df_repos['sample_date'].dt.strftime('%Y-%m-%d')  # Formatting to ensure discrete daily data
+
+# Filter the dataframe for 'active_developers' metric
+df_filtered = df_repos[df_repos['metric_name'] == 'active_developers']
+
+# Create the pivot table with the filtered data
+heatmap_data = df_filtered.pivot_table(index='project_name', 
+                                       columns='day', 
+                                       values='amount', 
+                                       aggfunc='sum', 
+                                       fill_value=0)
+
+# Creating the heatmap with custom color scale
+fig = px.imshow(heatmap_data,
+                labels=dict(x="Day", y="Project", color="Number of Active Developers"),
+                x=heatmap_data.columns,
+                y=heatmap_data.index,
+                aspect="equal",
+                title="Day-by-Day Square Heatmap of Active Developers by Project",
+                color_continuous_scale=[
+                    [0, "rgb(220,220,220)"],    # Light gray for 0
+                    [0.01, "rgb(220,220,220)"], # Light gray for 0
+                    [0.01, "rgb(237,248,233)"], # Very light green for 1-2
+                    [0.2, "rgb(186,228,179)"],  # Light green for 3-5
+                    [0.4, "rgb(116,196,118)"],  # Medium green for 6-10
+                    [1, "rgb(35,139,69)"]       # Dark green for 11+
+                ],
+                zmin=0,
+                zmax=11)
+
+# Update the layout to ensure squares and add color bar ticks
+fig.update_layout(
+    xaxis={'type': 'category'},
+    yaxis={'type': 'category'},
+    coloraxis_colorbar=dict(
+        tickvals=[0, 1.5, 4, 8, 11],
+        ticktext=["0", "1-2", "3-5", "6-10", "11+"]
+    )
+)
+fig.update_xaxes(side="top")
+
+fig.show()
