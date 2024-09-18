@@ -3,7 +3,7 @@ import pandas as pd
 
 def load_data():
     # Load the dataset
-    df = pd.read_csv("project_metrics.csv")
+    df = pd.read_csv("./data/project_metrics.csv")
     
     # Calculate the Activity Score
     df['Activity Score'] = (df['commit_count_6_months'] * 0.5) + \
