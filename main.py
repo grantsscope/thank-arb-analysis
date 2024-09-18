@@ -144,7 +144,7 @@ else:
     st.markdown("No projects found with last commit dates older than 3 months.")
 
 
-st.markdown("### What are the top projects based on development activities?")
+st.markdown("### How is the trend of active developers by project over last 6 months?")
 df_repos = pd.read_csv("./data/repos.csv")
 
 df_repos['sample_date'] = pd.to_datetime(df_repos['sample_date'])
@@ -189,4 +189,5 @@ fig.update_layout(
 )
 fig.update_xaxes(side="top")
 
-fig.show()
+# Display the plot in Streamlit
+st.plotly_chart(fig, use_container_width=True)
