@@ -33,8 +33,8 @@ def load_data():
         'Project Name', 'Activity Score', 'Commit Count', 
         'Merged Pull Request Count', 'Active Developer Count', 
         'Contributor Count', 'New Contributor Count', 'Repository Count',
-        'opened_pull_request_count_6_months', 'merged_pull_request_count_6_months',
-        'opened_issue_count_6_months', 'closed_issue_count_6_months'
+        '# of Open PRs', '# of Merged PRs',
+        '# of Issues Opened', '# of Issues Closed'
     ]
     
     # Sort by Activity Score in descending order
