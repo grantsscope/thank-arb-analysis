@@ -137,7 +137,7 @@ inactive_projects = inactive_projects.sort_values('Last Commit')
 
 # Display the list of inactive projects
 st.markdown("#### Other notes:")
-st.warning("Projects with no commits in the last 3 months:")
+st.error("Projects with no commits in the last 3 months:")
 if not inactive_projects.empty:
     for i, (_, project) in enumerate(inactive_projects.iterrows(), 1):
         st.markdown(f"{i}. {project['Project Name']} (Last commit: {project['Last Commit'].strftime('%d-%b-%Y')})")
@@ -191,23 +191,20 @@ fig.update_layout(
 # Display the plot in Streamlit
 st.plotly_chart(fig, use_container_width=True)
 
-# Optionally, display the data table with the new ratio
-columns_to_display.append('Activity per Developer')
-display_data = data[columns_to_display]
 
-st.dataframe(
-    display_data,
-    use_container_width=True,
-    hide_index=True,
-    column_config={
-        "Development Activity Index": st.column_config.NumberColumn(format="%d"),
-        "Activity per Developer": st.column_config.NumberColumn(format="%.2f"),
-    }
-)
+st.markdown("""
+### Trend Analysis: Active Developer Engagement Over the Past 6 Months
 
+This heatmap visualizes the daily active developer count for each project across its repositories over the last 6 months.
 
+**Key insights:**
+- Regular, consistent activity might indicate stable, ongoing development.
+- Sporadic intense activity could suggest sprint-based development or periodic major updates.
+- Long gray periods might indicate paused development or potential issues requiring attention.
+""")
 
-st.markdown("### Trend Analysis: Active Developer Engagement Over the Past 6 Months")
+st.info("Remember that this visualization shows quantity, not quality, of engagement. It's best used alongside other metrics for a comprehensive understanding of project health and progress.")
+
 df_repos = pd.read_csv("./data/repos.csv")
 
 df_repos['sample_date'] = pd.to_datetime(df_repos['sample_date'])
