@@ -59,17 +59,30 @@ total_issues_opened = round(data['# of Issues Opened'].sum())
 total_issues_closed = round(data['# of Issues Closed'].sum())
 
 st.markdown(f"\n Overall, Thank ARB is helping support: \
-            \n - {project_count} out of 54 projects projects with at least some recent OSS component to their work \
-            \n - {total_repos:,} Github repos \
-            \n - {total_contributors:,} contributors")
+            \n - {project_count} out of 54 projects with at least some recent OSS component to their work \
+            \n - a total of {total_repos:,} Github repos \
+            \n - {total_contributors:,} contributors over 6 months")
 
 st.markdown(f"\n In the last 6 months, these {project_count} projects: \
             \n - Attracted {new_contributors:,} new contributors \
             \n - Closed over {total_issues_closed:,} issues (and created {total_issues_opened:,} new ones) \
             \n - Merged over {total_merged_PR:,} pull requests (and opened {total_open_PR:,} new ones)")
 
-st.markdown("### Profiling based on code metrics in last 6 months")
-st.markdown("Projects are sorted based on their Activity Score. This is a composite metric based on code commits (50%), merged pull requests (30%), and active developer count (20%)")
+st.markdown("### What are the top projects based on coding activities?")
+st.markdown("""
+### Project Activity Analysis
+Projects are ranked according to their Activity Score, a composite metric derived from:
+- **Code Commits** (50%)
+- **Merged Pull Requests** (30%)
+- **Active Developer Count** (20%)
+
+This metric helps quantify and compare the development activity across projects.
+""")
+
+st.info("""
+**Note on Activity Score:** The Activity Score is a custom composite metric tailored to reflect project engagement. Depending on grant objectives, different combinations of metrics might be employed to more accurately evaluate grantee performance.
+""")
+
 
 # Analyze top performers
 top_performers = data.sort_values(by='Activity Score', ascending=False).head(5)
