@@ -16,6 +16,7 @@ def load_data():
     # Select and rename relevant columns
     df = df.rename(columns={
         'display_name': 'Project Name',
+        'repository_count': 'Repository Count',
         'commit_count_6_months': 'Commit Count',
         'merged_pull_request_count_6_months': 'Merged Pull Request Count',
         'active_developer_count_6_months': 'Active Developer Count',
@@ -26,7 +27,7 @@ def load_data():
     columns = [
         'Project Name', 'Activity Score', 'Commit Count', 
         'Merged Pull Request Count', 'Active Developer Count', 
-        'Contributor Count', 'New Contributor Count'
+        'Contributor Count', 'New Contributor Count', 'Repository Count'
     ]
     
     # Sort by Activity Score in descending order
@@ -40,9 +41,14 @@ st.title("Thank Arb Impact Analysis - DRAFT")
 st.markdown("This analysis focuses on a list of 54 projects uploaded in the [Thank Arb Grantee Collection](https://github.com/opensource-observer/oss-directory/blob/main/data/collections/thank-arb-grantees.yaml) \
             in OSO Directory. Note that this is a static data extracted as of September 18th, 2024. Refer [this](https://docs.google.com/spreadsheets/d/1Ka6x8GKcBNf1kmic2AjJMEeo7aGN8PBO3phvKcCW1hk/edit?gid=1301894510#gid=1301894510) spreadsheet for the coverage of artifacts for each projects used in this analysis.")
 
+# Load data
+data = load_data()
+
+total_repos = data['Repository Count'].sum()
+
 st.markdown("\n Overall, Thank Arb is helping support: \
             \n - 46 out of 54 projects projects with at least some recent OSS component to their work \
-            \n - 662 Github repos \
+            \n - {total_repos:,} Github repos \
             \n - 946 contributors")
 
 st.markdown("\n In the last 6 months, these 46 projects: \
@@ -52,9 +58,6 @@ st.markdown("\n In the last 6 months, these 46 projects: \
 
 st.markdown("### Profiling based on code metrics in last 6 months")
 st.markdown("Projects are sorted based on their Activity Score. This is a composite metric based on code commits (50%), merged pull requests (30%), and active developer count (20%)")
-
-# Load data
-data = load_data()
 
 # Analyze top performers
 top_performers = data.sort_values(by='Activity Score', ascending=False).head(5)
