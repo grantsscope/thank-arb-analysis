@@ -43,4 +43,4 @@ st.markdown("Projects are sorted based on their Activity Score. This is a compos
 data = load_data()
 
 # Display the dataframe without index
-st.dataframe(data, use_container_width=True, index=False)
+st.dataframe(data, use_container_width=True, hide_index=False)
