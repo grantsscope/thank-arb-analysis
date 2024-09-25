@@ -282,32 +282,45 @@ with onchain_metrics:
     # Step 5: Sort by highest positive percentage change
     merged_summary = merged_summary.sort_values(by='pct_change', ascending=False)
         
-        # Reshape the data for slope chart
-    df_slope = pd.melt(merged_summary, 
-                       id_vars=['project_name'], 
-                       value_vars=['transaction_count_before_july', 'transaction_count_after_july'],
-                       var_name='time_period', value_name='transaction_count')
+    # Create the dumbbell plot
+    fig = go.Figure()
     
-    # Rename time periods for better readability
-    df_slope['time_period'] = df_slope['time_period'].replace({
-        'transaction_count_before_july': 'Apr to June 2024',
-        'transaction_count_after_july': 'From July 1st, 2024'
-    })
+    # Add "before July" points
+    fig.add_trace(go.Scatter(
+        x=merged_summary['transaction_count_before_july'],
+        y=merged_summary['project_name'],
+        mode='markers',
+        name='Transactions (Apr to June 2024)',
+        marker=dict(color='blue', size=10),
+        hovertext=merged_summary['project_name']
+    ))
     
-    # Create the slope chart
-    fig = px.line(df_slope, 
-                  x='time_period', 
-                  y='transaction_count', 
-                  color='project_name', 
-                  markers=True, 
-                  title='Slope Chart of Transaction Count Before and After July 1st, 2024 by Project')
+    # Add "after July" points
+    fig.add_trace(go.Scatter(
+        x=merged_summary['transaction_count_after_july'],
+        y=merged_summary['project_name'],
+        mode='markers',
+        name='Transactions (From July 1st, 2024)',
+        marker=dict(color='green', size=10),
+        hovertext=merged_summary['project_name']
+    ))
     
-    # Update layout for readability
+    # Add lines connecting the two points for each project
+    for i in range(len(merged_summary)):
+        fig.add_shape(type='line',
+                      x0=merged_summary['transaction_count_before_july'].iloc[i],
+                      y0=i,
+                      x1=merged_summary['transaction_count_after_july'].iloc[i],
+                      y1=i,
+                      line=dict(color='gray', width=2))
+    
+    # Update layout
     fig.update_layout(
-        xaxis_title='Time Period',
-        yaxis_title='Transaction Count',
-        height=len(merged_summary) * 40 + 400,
-        showlegend=False  # Optionally hide the legend if the chart gets too cluttered
+        title='Transaction Count Before and After July 1st, 2024 by Project',
+        xaxis_title='Transaction Count',
+        yaxis_title='Projects',
+        height=len(merged_summary) * 40 + 400,  # Adjust height based on the number of projects
+        hovermode='y'
     )
 
     # Display the plot in Streamlit
