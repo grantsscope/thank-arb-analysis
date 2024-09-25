@@ -263,7 +263,25 @@ with code_metrics:
 
 with onchain_metrics:
     onchain_data = pd.read_csv("./data/monthly transactions by projects.csv")
-
+    
+    # Step 1: Create two separate dataframes, one for before and one for after July 1st
+    df_before_july = onchain_data[onchain_data['month'] < '2024-07']
+    df_after_july = onchain_data[onchain_data['month'] >= '2024-07']
+    
+    # Step 2: Group by project and calculate total transaction count for both periods
+    before_july_summary = df_before_july.groupby('project_name')['transaction_count'].sum().reset_index()
+    after_july_summary = df_after_july.groupby('project_name')['transaction_count'].sum().reset_index()
+    
+    # Step 3: Merge the two summaries into one dataframe
+    merged_summary = pd.merge(before_july_summary, after_july_summary, on='project_name', how='outer', suffixes=('_before_july', '_after_july')).fillna(0)
+    
+    # Step 4: Calculate percentage change ((after - before) / before) * 100
+    merged_summary['pct_change'] = ((merged_summary['transaction_count_after_july'] - merged_summary['transaction_count_before_july']) / 
+                                    merged_summary['transaction_count_before_july'].replace(0, 1)) * 100
+    
+    # Step 5: Sort by highest positive percentage change
+    merged_summary = merged_summary.sort_values(by='pct_change', ascending=False)
+    
     # Create the dumbbell plot
     fig = go.Figure()
     
