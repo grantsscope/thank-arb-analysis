@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 # Set page configuration to wide layout
 st.set_page_config(layout="wide")
 
-def load_data():
+def load_code_metrics_data():
     # Load the dataset
     df = pd.read_csv("./data/project_metrics.csv")
     
@@ -51,16 +51,16 @@ st.markdown("This analysis focuses on a list of 84 projects uploaded in the [Tha
             in OSO Directory. Note that this is a static data extracted as of September 25th, 2024.")
 
 # Load data
-data = load_data()
+metrics_data = load_code_metrics_data()
 
-project_count = len(data)
-total_repos = round(data['Repository Count'].sum())
-total_contributors = round(data['Contributor Count'].sum())
-new_contributors = round(data['New Contributor Count'].sum())
-total_open_PR = round(data['# of Open PRs'].sum())
-total_merged_PR = round(data['# of Merged PRs'].sum())
-total_issues_opened = round(data['# of Issues Opened'].sum())
-total_issues_closed = round(data['# of Issues Closed'].sum())
+project_count = len(metrics_data)
+total_repos = round(metrics_data['Repository Count'].sum())
+total_contributors = round(metrics_data['Contributor Count'].sum())
+new_contributors = round(metrics_data['New Contributor Count'].sum())
+total_open_PR = round(metrics_data['# of Open PRs'].sum())
+total_merged_PR = round(metrics_data['# of Merged PRs'].sum())
+total_issues_opened = round(metrics_data['# of Issues Opened'].sum())
+total_issues_closed = round(metrics_data['# of Issues Closed'].sum())
 
 st.markdown(f"\n Overall, Thank ARB is helping support: \
             \n - {project_count} out of 84 projects with at least some recent OSS component to their work \
@@ -88,10 +88,10 @@ with code_metrics:
     """)
     
     # Analyze top performers
-    top_performers = data.sort_values(by='Development Activity Index', ascending=False).head(5)
+    top_performers = metrics_data.sort_values(by='Development Activity Index', ascending=False).head(5)
     
     # Projects with increasing new contributors
-    emerging_projects = data[data['New Contributor Count'] > 0].sort_values(by='New Contributor Count', ascending=False).head(5)
+    emerging_projects = metrics_data[metrics_data['New Contributor Count'] > 0].sort_values(by='New Contributor Count', ascending=False).head(5)
     
     st.markdown("**Key insights:**")
     # Display summaries of top performers and emerging projects
@@ -119,7 +119,7 @@ with code_metrics:
     ]
     
     # Create a new dataframe with only the selected columns
-    display_data = data[columns_to_display]
+    display_data = metrics_data[columns_to_display]
     
     # Display the dataframe
     st.dataframe(
@@ -132,8 +132,8 @@ with code_metrics:
     )
     
     # Convert 'Last Commit' to datetime and filter projects
-    data['Last Commit'] = pd.to_datetime(data['Last Commit'], format='%Y-%m-%d %H:%M:%S%z')
-    inactive_projects = data[data['Last Commit'] < three_months_ago]
+    metrics_data['Last Commit'] = pd.to_datetime(metrics_data['Last Commit'], format='%Y-%m-%d %H:%M:%S%z')
+    inactive_projects = metrics_data[metrics_data['Last Commit'] < three_months_ago]
     
     # Sort inactive projects by last commit date
     inactive_projects = inactive_projects.sort_values('Last Commit')
@@ -167,10 +167,10 @@ with code_metrics:
     
     
     # Calculate the ratio
-    data['Activity per Developer'] = data['Development Activity Index'] / data['Active Developer Count']
+    metrics_data['Activity per Developer'] = metrics_data['Development Activity Index'] / metrics_data['Active Developer Count']
     
     # Sort the data by the ratio in descending order
-    sorted_data = data.sort_values('Activity per Developer', ascending=True)
+    sorted_data = metrics_data.sort_values('Activity per Developer', ascending=True)
     
     # Create a horizontal bar chart
     fig = go.Figure(go.Bar(
@@ -187,7 +187,7 @@ with code_metrics:
         title='Project Activity per Active Developer',
         xaxis_title='Development Activity Index per Active Developer',
         yaxis_title='Project Name',
-        height=max(600, len(data) * 25),  # Adjust height based on number of projects
+        height=max(600, len(metrics_data) * 25),  # Adjust height based on number of projects
         width=800
     )
     
