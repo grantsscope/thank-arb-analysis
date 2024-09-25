@@ -335,7 +335,7 @@ with onchain_metrics:
             title='Transaction Count (Log Scale)',
             type='log',
             side='top',  # Set the second x-axis on the top
-            matches='x'  # Ensure the ticks match with the bottom axis
+            mirror='allticks',  # Ensure that tick marks and labels are mirrored
         ),
         yaxis=dict(
             title='Projects (Sorted by % Change)',
