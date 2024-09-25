@@ -292,7 +292,7 @@ with onchain_metrics:
         name='Transactions (Apr to June 2024)',
         orientation='h',
         marker_color='blue',
-        hovertext=merged_summary['project_name']  # Adding project name for hover clarity
+        hovertext=merged_summary['project_name']
     ))
     
     # Add bar for 'From July 1st onward' period, going right (positive X-values)
@@ -308,9 +308,8 @@ with onchain_metrics:
     # Step 7: Update layout
     fig.update_layout(
         title='Transaction Count Comparison (Before and After July 1st, 2024) by Project',
-        xaxis_title='Transaction Count (Log Scale)',
+        xaxis_title='Transaction Count',
         yaxis_title='Projects',
-        xaxis_type='log',  # Use log scale for readability with large outliers
         barmode='overlay',  # Overlay bars for each period
         xaxis=dict(showgrid=True),  # Add gridlines for clarity
         height=len(merged_summary) * 40 + 400,  # Increase overall height for readability
@@ -324,7 +323,6 @@ with onchain_metrics:
     fig.update_yaxes(tickfont=dict(size=12), automargin=True)  # Increase font size for the y-axis
     fig.update_traces(marker_line_width=1.5, marker_line_color='black', opacity=0.85)  # Enhance visual clarity
 
-    
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
 
