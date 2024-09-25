@@ -275,53 +275,52 @@ with onchain_metrics:
     # Step 3: Merge the two summaries into one dataframe
     merged_summary = pd.merge(before_july_summary, after_july_summary, on='project_name', how='outer', suffixes=('_before_july', '_after_july')).fillna(0)
     
-    # Step 4: Calculate percentage change ((after - before) / before) * 100
-    merged_summary['pct_change'] = ((merged_summary['transaction_count_after_july'] - merged_summary['transaction_count_before_july']) / 
-                                    merged_summary['transaction_count_before_july'].replace(0, 1)) * 100
+    # Step 4: Sort by highest total transactions (optional, but improves readability)
+    merged_summary['total_transactions'] = merged_summary['transaction_count_before_july'] + merged_summary['transaction_count_after_july']
+    merged_summary = merged_summary.sort_values(by='total_transactions', ascending=False)
     
-    # Step 5: Sort by highest positive percentage change
-    merged_summary = merged_summary.sort_values(by='pct_change', ascending=False)
-    
-    # Create the dumbbell plot
+    # Step 5: Create the butterfly chart
     fig = go.Figure()
     
-    # Add "before July" points
-    fig.add_trace(go.Scatter(
-        x=merged_summary['transaction_count_before_july'],
+    # Add bar for 'Before July 1st' (left side of the butterfly chart)
+    fig.add_trace(go.Bar(
         y=merged_summary['project_name'],
-        mode='markers',
+        x=-merged_summary['transaction_count_before_july'],  # Negative values for left side
         name='Transactions (Apr to June 2024)',
-        marker=dict(color='blue', size=10),
+        orientation='h',
+        marker_color='blue',
         hovertext=merged_summary['project_name']
     ))
     
-    # Add "after July" points
-    fig.add_trace(go.Scatter(
-        x=merged_summary['transaction_count_after_july'],
+    # Add bar for 'After July 1st' (right side of the butterfly chart)
+    fig.add_trace(go.Bar(
         y=merged_summary['project_name'],
-        mode='markers',
+        x=merged_summary['transaction_count_after_july'],  # Positive values for right side
         name='Transactions (From July 1st, 2024)',
-        marker=dict(color='green', size=10),
+        orientation='h',
+        marker_color='green',
         hovertext=merged_summary['project_name']
     ))
     
-    # Add lines connecting the two points for each project
-    for i in range(len(merged_summary)):
-        fig.add_shape(type='line',
-                      x0=merged_summary['transaction_count_before_july'].iloc[i],
-                      y0=i,
-                      x1=merged_summary['transaction_count_after_july'].iloc[i],
-                      y1=i,
-                      line=dict(color='gray', width=2))
-    
-    # Update layout
+    # Step 6: Update layout for the butterfly chart
     fig.update_layout(
-        title='Transaction Count Before and After July 1st, 2024 by Project',
+        title='Butterfly Chart of Transaction Count Before and After July 1st, 2024 by Project',
         xaxis_title='Transaction Count',
         yaxis_title='Projects',
-        height=len(merged_summary) * 40 + 400,  # Adjust height based on the number of projects
-        hovermode='y'
+        barmode='overlay',  # Overlay bars for symmetrical comparison
+        xaxis=dict(tickvals=[-max(merged_summary['transaction_count_before_july']), max(merged_summary['transaction_count_after_july'])],  # Adjust tick values for symmetry
+                   tickmode='array', range=[-max(merged_summary['transaction_count_before_july'])*1.1, max(merged_summary['transaction_count_after_july'])*1.1]),  # Adjust range for symmetry
+        height=len(merged_summary) * 40 + 400,  # Adjust height for readability based on number of projects
+        bargap=0.15,  # Gap between bars
+        bargroupgap=0.1,
+        legend_title_text='Period',
+        hovermode='y unified'
     )
+    
+    # Increase the height of each row and adjust the size of the chart for better readability
+    fig.update_yaxes(tickfont=dict(size=12), automargin=True)  # Increase font size for the y-axis
+    fig.update_traces(marker_line_width=1.5, marker_line_color='black', opacity=0.85)  # Add border for better visibility
+
 
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
