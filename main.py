@@ -285,9 +285,9 @@ with onchain_metrics:
     # Create the dumbbell plot
     fig = go.Figure()
     
-    # Add "before July" points
+    # Add "before July" points (use log scale for X-axis)
     fig.add_trace(go.Scatter(
-        x=merged_summary['transaction_count_before_july'],
+        x=merged_summary['transaction_count_before_july'] + 1,  # Avoid log(0) by adding 1
         y=merged_summary['project_name'],
         mode='markers',
         name='Transactions (Apr to June 2024)',
@@ -295,9 +295,9 @@ with onchain_metrics:
         hovertext=merged_summary['project_name']
     ))
     
-    # Add "after July" points
+    # Add "after July" points (use log scale for X-axis)
     fig.add_trace(go.Scatter(
-        x=merged_summary['transaction_count_after_july'],
+        x=merged_summary['transaction_count_after_july'] + 1,  # Avoid log(0) by adding 1
         y=merged_summary['project_name'],
         mode='markers',
         name='Transactions (From July 1st, 2024)',
@@ -308,19 +308,20 @@ with onchain_metrics:
     # Add lines connecting the two points for each project
     for i in range(len(merged_summary)):
         fig.add_shape(type='line',
-                      x0=merged_summary['transaction_count_before_july'].iloc[i],
+                      x0=merged_summary['transaction_count_before_july'].iloc[i] + 1,
                       y0=i,
-                      x1=merged_summary['transaction_count_after_july'].iloc[i],
+                      x1=merged_summary['transaction_count_after_july'].iloc[i] + 1,
                       y1=i,
                       line=dict(color='gray', width=2))
     
-    # Update layout
+    # Update layout with a log scale for the X-axis
     fig.update_layout(
-        title='Transaction Count Before and After July 1st, 2024 by Project',
-        xaxis_title='Transaction Count',
+        title='Dumbbell Plot of Transaction Count Before and After July 1st, 2024 by Project',
+        xaxis_title='Transaction Count (Log Scale)',
         yaxis_title='Projects',
+        xaxis_type='log',  # Apply logarithmic scale to the X-axis
         height=len(merged_summary) * 40 + 400,  # Adjust height based on the number of projects
-        hovermode='y'
+        hovermode='y unified'
     )
 
     # Display the plot in Streamlit
