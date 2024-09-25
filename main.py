@@ -285,35 +285,45 @@ with onchain_metrics:
     # Step 6: Create the diverging bar chart
     fig = go.Figure()
     
-    # Add bar for 'before July 1st' period (going left, so values are negative)
+    # Add bar for 'Before July 1st' (April to June, 3-month period) period, going left (negative X-values)
     fig.add_trace(go.Bar(
         y=merged_summary['project_name'],
-        x=-merged_summary['transaction_count_before_july'],  # Negative values for the left direction
-        name='Transactions (Before July 1st)',
+        x=-merged_summary['transaction_count_before_july'],  # Negative values for left direction
+        name='Transactions (Apr to June 2024)',
         orientation='h',
-        marker_color='blue'
+        marker_color='blue',
+        hovertext=merged_summary['project_name']  # Adding project name for hover clarity
     ))
     
-    # Add bar for 'from and including July 1st' period (going right)
+    # Add bar for 'From July 1st onward' period, going right (positive X-values)
     fig.add_trace(go.Bar(
         y=merged_summary['project_name'],
-        x=merged_summary['transaction_count_after_july'],  # Positive values for the right direction
-        name='Transactions (From July 1st)',
+        x=merged_summary['transaction_count_after_july'],  # Positive values for right direction
+        name='Transactions (From July 1st, 2024)',
         orientation='h',
-        marker_color='green'
+        marker_color='green',
+        hovertext=merged_summary['project_name']
     ))
     
     # Step 7: Update layout
     fig.update_layout(
-        title='Transaction Count Before and After July 1st, 2024 by Project',
-        xaxis_title='Transaction Count',
+        title='Transaction Count Comparison (Before and After July 1st, 2024) by Project',
+        xaxis_title='Transaction Count (Log Scale)',
         yaxis_title='Projects',
-        barmode='overlay',  # Bars are overlayed, one negative and one positive
-        xaxis=dict(tickvals=[-max(merged_summary['transaction_count_before_july']), max(merged_summary['transaction_count_after_july'])]),  # Adjust tick values based on data
-        showlegend=True,
-        legend_title_text='Time Period',
+        xaxis_type='log',  # Use log scale for readability with large outliers
+        barmode='overlay',  # Overlay bars for each period
+        xaxis=dict(showgrid=True),  # Add gridlines for clarity
+        height=len(merged_summary) * 40 + 400,  # Increase overall height for readability
+        bargap=0.15,  # Space between bars
+        bargroupgap=0.1,
+        legend_title_text='Period',
         hovermode='y unified'
     )
+    
+    # Increase the height of each row and adjust the size of the chart for better readability
+    fig.update_yaxes(tickfont=dict(size=12), automargin=True)  # Increase font size for the y-axis
+    fig.update_traces(marker_line_width=1.5, marker_line_color='black', opacity=0.85)  # Enhance visual clarity
+
     
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
