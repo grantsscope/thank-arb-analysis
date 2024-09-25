@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import pytz
 import plotly.express as px
 import plotly.graph_objects as go
-
+    
 # Set page configuration to wide layout
 st.set_page_config(layout="wide")
 
@@ -72,7 +72,7 @@ st.markdown(f"\n In the last 6 months, these {project_count} projects: \
             \n - Closed over {total_issues_closed:,} issues (and created {total_issues_opened:,} new ones) \
             \n - Merged over {total_merged_PR:,} pull requests (and opened {total_open_PR:,} new ones)")
 
-code_metrics, artifacts = st.tabs(["Code Metrics", "Reference - Project Artifacts"])
+onchain_metrics, code_metrics, artifacts = st.tabs(["Onchain Transactions", "Code Metrics", "Reference - Project Artifacts"])
 
 with code_metrics:
     st.markdown("### What are the top projects based on development activities?")
@@ -260,3 +260,57 @@ with code_metrics:
 
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
+
+with onchain_metrics:
+    onchain_data = pd.read_csv("./data/monthly transactions by projects.csv")
+
+    # Assuming onchain_data has columns: 'month', 'transaction_count', 'project_name'
+    
+    # Create two separate dataframes, one for before and one for after July 1st
+    df_before_july = onchain_data[onchain_data['month'] < '2024-07']
+    df_after_july = onchain_data[onchain_data['month'] >= '2024-07']
+    
+    # Create a list of all project names
+    projects = onchain_data['project_name'].unique()
+    
+    # Create a figure for the grouped bar chart
+    fig = go.Figure()
+    
+    # Loop through each project and add bars for 'before' and 'after' for each project
+    for project in projects:
+        # Filter data by project
+        df_project_before = df_before_july[df_before_july['project_name'] == project]
+        df_project_after = df_after_july[df_after_july['project_name'] == project]
+        
+        # Add bar for 'before July 1st' period
+        fig.add_trace(go.Bar(
+            x=['Before July 1st'] * len(df_project_before),
+            y=df_project_before['transaction_count'],
+            name=f'Transactions (Before July 1st) - {project}',
+            marker_color='blue',
+            hovertext=[project] * len(df_project_before)
+        ))
+        
+        # Add bar for 'after July 1st' period
+        fig.add_trace(go.Bar(
+            x=['After July 1st'] * len(df_project_after),
+            y=df_project_after['transaction_count'],
+            name=f'Transactions (After July 1st) - {project}',
+            marker_color='green',
+            hovertext=[project] * len(df_project_after)
+        ))
+    
+    # Update layout to make it clearer and adjust bar mode
+    fig.update_layout(
+        title='Transaction Count Comparison Before and After July 1st, 2024 by Project',
+        xaxis_title='Time Period',
+        yaxis_title='Transaction Count',
+        barmode='group',  # Group the bars side by side
+        bargap=0.15,
+        bargroupgap=0.1,
+        legend_title_text='Projects',
+        hovermode='x unified'
+    )
+    
+    fig.show()
+
