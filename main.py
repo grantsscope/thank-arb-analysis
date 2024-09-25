@@ -258,5 +258,5 @@ with code_metrics:
     )
     fig.update_xaxes(side="top")
 
-# Display the plot in Streamlit
-st.plotly_chart(fig, use_container_width=True)
+    # Display the plot in Streamlit
+    st.plotly_chart(fig, use_container_width=True)
