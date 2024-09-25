@@ -263,6 +263,20 @@ with code_metrics:
 
 with onchain_metrics:
     onchain_data = pd.read_csv("./data/monthly transactions by projects.csv")
+
+    st.markdown("""
+    ### Which projects have gained most momentum in # of onchain transactions since July 1st, 2024?
+    
+    - **Logarithmic Scale**: The x-axis represents the transaction counts on a log scale. This compresses the range of values, making it easier to compare projects with very large or very small transaction counts.
+    - **Before and After**: 
+        - **Blue markers** represent transaction counts for each project before July 1st (April to June 2024).
+        - **Green markers** represent transaction counts from July 1st, 2024 onward.
+    - **Connecting Lines**:
+        - **Gray lines** indicate projects where transaction counts increased or stayed the same after July 1st.
+        - **Red lines** highlight projects that experienced a drop in transaction counts after July 1st.
+    - **Sorting**: Projects are sorted by the percentage change in transaction count, with projects showing the largest positive changes at the top.
+    """)
+
     
     # Create two separate dataframes, one for before and one for after July 1st
     df_before_july = onchain_data[onchain_data['month'] < '2024-07']
