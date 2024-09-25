@@ -264,65 +264,58 @@ with code_metrics:
 with onchain_metrics:
     onchain_data = pd.read_csv("./data/monthly transactions by projects.csv")
     
-    # Step 1: Create two separate dataframes, one for before and one for after July 1st
-    df_before_july = onchain_data[onchain_data['month'] < '2024-07']
-    df_after_july = onchain_data[onchain_data['month'] >= '2024-07']
-    
-    # Step 2: Group by project and calculate total transaction count for both periods
-    before_july_summary = df_before_july.groupby('project_name')['transaction_count'].sum().reset_index()
-    after_july_summary = df_after_july.groupby('project_name')['transaction_count'].sum().reset_index()
-    
-    # Step 3: Merge the two summaries into one dataframe
-    merged_summary = pd.merge(before_july_summary, after_july_summary, on='project_name', how='outer', suffixes=('_before_july', '_after_july')).fillna(0)
-    
-    # Step 4: Calculate percentage change ((after - before) / before) * 100
+    # Step 1: Calculate percentage change ((after - before) / before) * 100
     merged_summary['pct_change'] = ((merged_summary['transaction_count_after_july'] - merged_summary['transaction_count_before_july']) / 
                                     merged_summary['transaction_count_before_july'].replace(0, 1)) * 100
     
-    # Step 5: Sort by highest positive percentage change
+    # Step 2: Sort the data by percentage change (highest to lowest)
     merged_summary = merged_summary.sort_values(by='pct_change', ascending=False)
-        
-    # Create the dumbbell plot
+    
+    # Step 3: Identify projects with drops (transaction count after July is less than before July)
+    merged_summary['dropped'] = merged_summary['transaction_count_after_july'] < merged_summary['transaction_count_before_july']
+    
+    # Step 4: Create the dumbbell plot
     fig = go.Figure()
     
-    # Add "before July" points (use log scale for X-axis)
+    # Add "before July" points (use different color if project has dropped)
     fig.add_trace(go.Scatter(
-        x=merged_summary['transaction_count_before_july'] + 1,  # Avoid log(0) by adding 1
+        x=merged_summary['transaction_count_before_july'],
         y=merged_summary['project_name'],
         mode='markers',
         name='Transactions (Apr to June 2024)',
-        marker=dict(color='blue', size=10),
+        marker=dict(color=['red' if drop else 'blue' for drop in merged_summary['dropped']], size=10),  # Red if dropped, Blue otherwise
         hovertext=merged_summary['project_name']
     ))
     
-    # Add "after July" points (use log scale for X-axis)
+    # Add "after July" points (use different color if project has dropped)
     fig.add_trace(go.Scatter(
-        x=merged_summary['transaction_count_after_july'] + 1,  # Avoid log(0) by adding 1
+        x=merged_summary['transaction_count_after_july'],
         y=merged_summary['project_name'],
         mode='markers',
         name='Transactions (From July 1st, 2024)',
-        marker=dict(color='green', size=10),
+        marker=dict(color=['red' if drop else 'green' for drop in merged_summary['dropped']], size=10),  # Red if dropped, Green otherwise
         hovertext=merged_summary['project_name']
     ))
     
     # Add lines connecting the two points for each project
     for i in range(len(merged_summary)):
         fig.add_shape(type='line',
-                      x0=merged_summary['transaction_count_before_july'].iloc[i] + 1,
+                      x0=merged_summary['transaction_count_before_july'].iloc[i],
                       y0=i,
-                      x1=merged_summary['transaction_count_after_july'].iloc[i] + 1,
+                      x1=merged_summary['transaction_count_after_july'].iloc[i],
                       y1=i,
                       line=dict(color='gray', width=2))
     
-    # Update layout with a log scale for the X-axis
+    # Step 5: Update layout with sorting and highlighting
     fig.update_layout(
-        title='Dumbbell Plot of Transaction Count Before and After July 1st, 2024 by Project',
-        xaxis_title='Transaction Count (Log Scale)',
-        yaxis_title='Projects',
-        xaxis_type='log',  # Apply logarithmic scale to the X-axis
+        title='Dumbbell Plot of Transaction Count Before and After July 1st, 2024 by Project (Sorted by % Change)',
+        xaxis_title='Transaction Count',
+        yaxis_title='Projects (Sorted by % Change)',
         height=len(merged_summary) * 40 + 400,  # Adjust height based on the number of projects
         hovermode='y unified'
     )
+        
+    
 
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
