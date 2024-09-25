@@ -263,7 +263,7 @@ with code_metrics:
 
 with onchain_metrics:
     onchain_data = pd.read_csv("./data/monthly transactions by projects.csv")
-
+    
     # Create two separate dataframes, one for before and one for after July 1st
     df_before_july = onchain_data[onchain_data['month'] < '2024-07']
     df_after_july = onchain_data[onchain_data['month'] >= '2024-07']
@@ -330,15 +330,17 @@ with onchain_metrics:
             type='log',
             side='bottom',  # Set the first x-axis on the bottom
             showline=True,  # Show line at the bottom
-            mirror=True  # Mirror the axis at the top
+            mirror='allticks',  # Ensure that tick marks and labels are mirrored
         ),
         xaxis2=dict(
             title='Transaction Count (Log Scale)',
             type='log',
             side='top',  # Set the second x-axis on the top
-            overlaying='x',  # Overlay this axis with the first one
             showline=True,  # Show line at the top
-            mirror=True  # Mirror the axis with the bottom
+            overlaying='x',  # Ensure the top axis overlays the bottom one
+            ticks='outside',  # Place tick marks outside the axis
+            tickmode='auto',  # Auto mode for tick spacing
+            matches='x'  # Ensure the ticks match with the bottom axis
         ),
         yaxis=dict(
             title='Projects (Sorted by % Change)',
@@ -350,6 +352,7 @@ with onchain_metrics:
     
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
+
 
 
 
