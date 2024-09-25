@@ -46,6 +46,7 @@ def load_code_metrics_data():
 
 # Set up the Streamlit interface
 st.title("Thank ARB Impact Analysis - DRAFT")
+st.markdown("[Powered by OSO](https://www.opensource.observer/)")
 
 st.markdown("This analysis focuses on a list of 84 projects uploaded in the [Thank ARB Grantee Collection](https://github.com/opensource-observer/oss-directory/blob/main/data/collections/thank-arb-grantees.yaml) \
             in OSO Directory. Note that this is a static data extracted as of September 25th, 2024.")
@@ -72,7 +73,7 @@ st.markdown(f"\n In the last 6 months, these {project_count} projects: \
             \n - Closed over {total_issues_closed:,} issues (and created {total_issues_opened:,} new ones) \
             \n - Merged over {total_merged_PR:,} pull requests (and opened {total_open_PR:,} new ones)")
 
-onchain_metrics, code_metrics, artifacts = st.tabs(["Onchain Transactions", "Code Metrics", "Reference - Project Artifacts"])
+onchain_metrics, code_metrics = st.tabs(["Onchain Transactions", "Code Metrics"])
 
 with code_metrics:
     st.markdown("### What are the top projects based on development activities?")
