@@ -279,13 +279,6 @@ with onchain_metrics:
     merged_summary['pct_change'] = ((merged_summary['transaction_count_after_july'] - merged_summary['transaction_count_before_july']) / 
                                     merged_summary['transaction_count_before_july'].replace(0, 1)) * 100
     
-    # Sort by highest positive percentage change
-    merged_summary = merged_summary.sort_values(by='pct_change', ascending=False)
-    
-    # Calculate percentage change ((after - before) / before) * 100
-    merged_summary['pct_change'] = ((merged_summary['transaction_count_after_july'] - merged_summary['transaction_count_before_july']) / 
-                                    merged_summary['transaction_count_before_july'].replace(0, 1)) * 100
-    
     # Sort the data by percentage change (highest to lowest)
     merged_summary = merged_summary.sort_values(by='pct_change', ascending=False)
     
@@ -295,46 +288,51 @@ with onchain_metrics:
     # Create the dumbbell plot
     fig = go.Figure()
     
-    # Add "before July" points (use different color if project has dropped)
+    # Add 1 to avoid log(0) errors (since log scale cannot handle zero values)
+    merged_summary['transaction_count_before_july'] = merged_summary['transaction_count_before_july'] + 1
+    merged_summary['transaction_count_after_july'] = merged_summary['transaction_count_after_july'] + 1
+    
+    # Add "before July" points
     fig.add_trace(go.Scatter(
         x=merged_summary['transaction_count_before_july'],
         y=merged_summary['project_name'],
         mode='markers',
         name='Transactions (Apr to June 2024)',
-        marker=dict(color=['red' if drop else 'blue' for drop in merged_summary['dropped']], size=10),  # Red if dropped, Blue otherwise
+        marker=dict(color='blue', size=10, opacity=0.7),  # Opacity to maintain distinction
         hovertext=merged_summary['project_name']
     ))
     
-    # Add "after July" points (use different color if project has dropped)
+    # Add "after July" points
     fig.add_trace(go.Scatter(
         x=merged_summary['transaction_count_after_july'],
         y=merged_summary['project_name'],
         mode='markers',
         name='Transactions (From July 1st, 2024)',
-        marker=dict(color=['red' if drop else 'green' for drop in merged_summary['dropped']], size=10),  # Red if dropped, Green otherwise
+        marker=dict(color='green', size=10, opacity=0.7),
         hovertext=merged_summary['project_name']
     ))
     
-    # Add lines connecting the two points for each project
+    # Add lines connecting the two points, red lines for projects with drops
     for i in range(len(merged_summary)):
+        line_color = 'red' if merged_summary['dropped'].iloc[i] else 'gray'
         fig.add_shape(type='line',
                       x0=merged_summary['transaction_count_before_july'].iloc[i],
                       y0=i,
                       x1=merged_summary['transaction_count_after_july'].iloc[i],
                       y1=i,
-                      line=dict(color='gray', width=2))
+                      line=dict(color=line_color, width=2))
     
-    # Step 5: Update layout with sorting and highlighting
+    # Update layout with logarithmic scale
     fig.update_layout(
-        title='Dumbbell Plot of Transaction Count Before and After July 1st, 2024 by Project (Sorted by % Change)',
-        xaxis_title='Transaction Count',
+        title='Dumbbell Plot of Transaction Count Before and After July 1st, 2024 by Project (Log Scale)',
+        xaxis_title='Transaction Count (Log Scale)',
         yaxis_title='Projects (Sorted by % Change)',
+        xaxis_type='log',  # Apply log scale to the X-axis
         height=len(merged_summary) * 40 + 400,  # Adjust height based on the number of projects
         hovermode='y unified'
     )
-        
     
-
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
+
 
