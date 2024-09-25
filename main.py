@@ -312,5 +312,6 @@ with onchain_metrics:
         hovermode='x unified'
     )
     
-    fig.show()
+    # Display the plot in Streamlit
+    st.plotly_chart(fig, use_container_width=True)
 
