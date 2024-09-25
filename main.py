@@ -279,7 +279,7 @@ with onchain_metrics:
     merged_summary['pct_change'] = ((merged_summary['transaction_count_after_july'] - merged_summary['transaction_count_before_july']) / 
                                     merged_summary['transaction_count_before_july'].replace(0, 1)) * 100
     
-    # Sort the data by percentage change (highest to lowest)
+    # Sort the data by percentage change in descending order (highest to lowest)
     merged_summary = merged_summary.sort_values(by='pct_change', ascending=False)
     
     # Identify projects with drops (transaction count after July is less than before July)
@@ -322,17 +322,34 @@ with onchain_metrics:
                       y1=i,
                       line=dict(color=line_color, width=2))
     
-    # Update layout with logarithmic scale
+    # Update layout with two x-axes (top and bottom) and logarithmic scale
     fig.update_layout(
         title='Dumbbell Plot of Transaction Count Before and After July 1st, 2024 by Project (Log Scale)',
-        xaxis_title='Transaction Count (Log Scale)',
-        yaxis_title='Projects (Sorted by % Change)',
-        xaxis_type='log',  # Apply log scale to the X-axis
+        xaxis=dict(
+            title='Transaction Count (Log Scale)',
+            type='log',
+            side='bottom',  # Set the first x-axis on the bottom
+            showline=True,  # Show line at the bottom
+            mirror=True  # Mirror the axis at the top
+        ),
+        xaxis2=dict(
+            title='Transaction Count (Log Scale)',
+            type='log',
+            side='top',  # Set the second x-axis on the top
+            overlaying='x',  # Overlay this axis with the first one
+            showline=True,  # Show line at the top
+            mirror=True  # Mirror the axis with the bottom
+        ),
+        yaxis=dict(
+            title='Projects (Sorted by % Change)',
+            autorange="reversed"  # Reverse the Y-axis to show descending order
+        ),
         height=len(merged_summary) * 40 + 400,  # Adjust height based on the number of projects
         hovermode='y unified'
     )
     
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
+
 
 
