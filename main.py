@@ -264,52 +264,55 @@ with code_metrics:
 with onchain_metrics:
     onchain_data = pd.read_csv("./data/monthly transactions by projects.csv")
 
-    # Assuming onchain_data has columns: 'month', 'transaction_count', 'project_name'
-    
-    # Create two separate dataframes, one for before and one for after July 1st
+    # Step 1: Create two separate dataframes, one for before and one for after July 1st
     df_before_july = onchain_data[onchain_data['month'] < '2024-07']
     df_after_july = onchain_data[onchain_data['month'] >= '2024-07']
     
-    # Create a list of all project names
-    projects = onchain_data['project_name'].unique()
+    # Step 2: Group by project and calculate total transaction count for both periods
+    before_july_summary = df_before_july.groupby('project_name')['transaction_count'].sum().reset_index()
+    after_july_summary = df_after_july.groupby('project_name')['transaction_count'].sum().reset_index()
     
-    # Create a figure for the grouped bar chart
+    # Step 3: Merge the two summaries into one dataframe
+    merged_summary = pd.merge(before_july_summary, after_july_summary, on='project_name', how='outer', suffixes=('_before_july', '_after_july')).fillna(0)
+    
+    # Step 4: Calculate percentage change ((after - before) / before) * 100
+    merged_summary['pct_change'] = ((merged_summary['transaction_count_after_july'] - merged_summary['transaction_count_before_july']) / 
+                                    merged_summary['transaction_count_before_july'].replace(0, 1)) * 100
+    
+    # Step 5: Sort by highest positive percentage change
+    merged_summary = merged_summary.sort_values(by='pct_change', ascending=False)
+    
+    # Step 6: Create the diverging bar chart
     fig = go.Figure()
     
-    # Loop through each project and add bars for 'before' and 'after' for each project
-    for project in projects:
-        # Filter data by project
-        df_project_before = df_before_july[df_before_july['project_name'] == project]
-        df_project_after = df_after_july[df_after_july['project_name'] == project]
-        
-        # Add bar for 'before July 1st' period
-        fig.add_trace(go.Bar(
-            x=['Before July 1st'] * len(df_project_before),
-            y=df_project_before['transaction_count'],
-            name=f'Transactions (Before July 1st) - {project}',
-            marker_color='blue',
-            hovertext=[project] * len(df_project_before)
-        ))
-        
-        # Add bar for 'after July 1st' period
-        fig.add_trace(go.Bar(
-            x=['After July 1st'] * len(df_project_after),
-            y=df_project_after['transaction_count'],
-            name=f'Transactions (After July 1st) - {project}',
-            marker_color='green',
-            hovertext=[project] * len(df_project_after)
-        ))
+    # Add bar for 'before July 1st' period (going left, so values are negative)
+    fig.add_trace(go.Bar(
+        y=merged_summary['project_name'],
+        x=-merged_summary['transaction_count_before_july'],  # Negative values for the left direction
+        name='Transactions (Before July 1st)',
+        orientation='h',
+        marker_color='blue'
+    ))
     
-    # Update layout to make it clearer and adjust bar mode
+    # Add bar for 'from and including July 1st' period (going right)
+    fig.add_trace(go.Bar(
+        y=merged_summary['project_name'],
+        x=merged_summary['transaction_count_after_july'],  # Positive values for the right direction
+        name='Transactions (From July 1st)',
+        orientation='h',
+        marker_color='green'
+    ))
+    
+    # Step 7: Update layout
     fig.update_layout(
-        title='Transaction Count Comparison Before and After July 1st, 2024 by Project',
-        xaxis_title='Time Period',
-        yaxis_title='Transaction Count',
-        barmode='group',  # Group the bars side by side
-        bargap=0.15,
-        bargroupgap=0.1,
-        legend_title_text='Projects',
-        hovermode='x unified'
+        title='Transaction Count Before and After July 1st, 2024 by Project',
+        xaxis_title='Transaction Count',
+        yaxis_title='Projects',
+        barmode='overlay',  # Bars are overlayed, one negative and one positive
+        xaxis=dict(tickvals=[-max(merged_summary['transaction_count_before_july']), max(merged_summary['transaction_count_after_july'])]),  # Adjust tick values based on data
+        showlegend=True,
+        legend_title_text='Time Period',
+        hovermode='y unified'
     )
     
     # Display the plot in Streamlit
