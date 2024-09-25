@@ -331,12 +331,7 @@ with onchain_metrics:
             side='bottom',  # Set the first x-axis on the bottom
             mirror='allticks',  # Ensure that tick marks and labels are mirrored
         ),
-        xaxis2=dict(
-            title='Transaction Count (Log Scale)',
-            type='log',
-            side='top',  # Set the second x-axis on the top
-            mirror='allticks',  # Ensure that tick marks and labels are mirrored
-        ),
+        
         yaxis=dict(
             title='Projects (Sorted by % Change)',
             autorange="reversed"  # Reverse the Y-axis to show descending order
