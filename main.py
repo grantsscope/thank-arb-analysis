@@ -264,64 +264,46 @@ with code_metrics:
 with onchain_metrics:
     onchain_data = pd.read_csv("./data/monthly transactions by projects.csv")
 
-    # Step 1: Create two separate dataframes, one for before and one for after July 1st
-    df_before_july = onchain_data[onchain_data['month'] < '2024-07']
-    df_after_july = onchain_data[onchain_data['month'] >= '2024-07']
-    
-    # Step 2: Group by project and calculate total transaction count for both periods
-    before_july_summary = df_before_july.groupby('project_name')['transaction_count'].sum().reset_index()
-    after_july_summary = df_after_july.groupby('project_name')['transaction_count'].sum().reset_index()
-    
-    # Step 3: Merge the two summaries into one dataframe
-    merged_summary = pd.merge(before_july_summary, after_july_summary, on='project_name', how='outer', suffixes=('_before_july', '_after_july')).fillna(0)
-    
-    # Step 4: Calculate percentage change ((after - before) / before) * 100
-    merged_summary['pct_change'] = ((merged_summary['transaction_count_after_july'] - merged_summary['transaction_count_before_july']) / 
-                                    merged_summary['transaction_count_before_july'].replace(0, 1)) * 100
-    
-    # Step 5: Sort by highest positive percentage change
-    merged_summary = merged_summary.sort_values(by='pct_change', ascending=False)
-    
-    # Step 6: Create the diverging bar chart
+    # Create the dumbbell plot
     fig = go.Figure()
     
-    # Add bar for 'Before July 1st' (April to June, 3-month period) period, going left (negative X-values)
-    fig.add_trace(go.Bar(
+    # Add "before July" points
+    fig.add_trace(go.Scatter(
+        x=merged_summary['transaction_count_before_july'],
         y=merged_summary['project_name'],
-        x=-merged_summary['transaction_count_before_july'],  # Negative values for left direction
+        mode='markers',
         name='Transactions (Apr to June 2024)',
-        orientation='h',
-        marker_color='blue',
+        marker=dict(color='blue', size=10),
         hovertext=merged_summary['project_name']
     ))
     
-    # Add bar for 'From July 1st onward' period, going right (positive X-values)
-    fig.add_trace(go.Bar(
+    # Add "after July" points
+    fig.add_trace(go.Scatter(
+        x=merged_summary['transaction_count_after_july'],
         y=merged_summary['project_name'],
-        x=merged_summary['transaction_count_after_july'],  # Positive values for right direction
+        mode='markers',
         name='Transactions (From July 1st, 2024)',
-        orientation='h',
-        marker_color='green',
+        marker=dict(color='green', size=10),
         hovertext=merged_summary['project_name']
     ))
     
-    # Step 7: Update layout
+    # Add lines connecting the two points for each project
+    for i in range(len(merged_summary)):
+        fig.add_shape(type='line',
+                      x0=merged_summary['transaction_count_before_july'].iloc[i],
+                      y0=i,
+                      x1=merged_summary['transaction_count_after_july'].iloc[i],
+                      y1=i,
+                      line=dict(color='gray', width=2))
+    
+    # Update layout
     fig.update_layout(
-        title='Transaction Count Comparison (Before and After July 1st, 2024) by Project',
+        title='Transaction Count Before and After July 1st, 2024 by Project',
         xaxis_title='Transaction Count',
         yaxis_title='Projects',
-        barmode='overlay',  # Overlay bars for each period
-        xaxis=dict(showgrid=True),  # Add gridlines for clarity
-        height=len(merged_summary) * 40 + 400,  # Increase overall height for readability
-        bargap=0.15,  # Space between bars
-        bargroupgap=0.1,
-        legend_title_text='Period',
-        hovermode='y unified'
+        height=len(merged_summary) * 40 + 400,  # Adjust height based on the number of projects
+        hovermode='y'
     )
-    
-    # Increase the height of each row and adjust the size of the chart for better readability
-    fig.update_yaxes(tickfont=dict(size=12), automargin=True)  # Increase font size for the y-axis
-    fig.update_traces(marker_line_width=1.5, marker_line_color='black', opacity=0.85)  # Enhance visual clarity
 
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
