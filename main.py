@@ -297,7 +297,7 @@ with onchain_metrics:
         x=merged_summary['transaction_count_before_july'],
         y=merged_summary['project_name'],
         mode='markers',
-        name='Transactions (Apr to June 2024)',
+        name='Apr to June 2024',
         marker=dict(color='blue', size=10, opacity=0.7),  # Opacity to maintain distinction
         hovertext=merged_summary['project_name']
     ))
@@ -307,7 +307,7 @@ with onchain_metrics:
         x=merged_summary['transaction_count_after_july'],
         y=merged_summary['project_name'],
         mode='markers',
-        name='Transactions (From July 1st, 2024)',
+        name='From July 1st, 2024',
         marker=dict(color='green', size=10, opacity=0.7),
         hovertext=merged_summary['project_name']
     ))
@@ -329,17 +329,12 @@ with onchain_metrics:
             title='Transaction Count (Log Scale)',
             type='log',
             side='bottom',  # Set the first x-axis on the bottom
-            showline=True,  # Show line at the bottom
             mirror='allticks',  # Ensure that tick marks and labels are mirrored
         ),
         xaxis2=dict(
             title='Transaction Count (Log Scale)',
             type='log',
             side='top',  # Set the second x-axis on the top
-            showline=True,  # Show line at the top
-            overlaying='x',  # Ensure the top axis overlays the bottom one
-            ticks='outside',  # Place tick marks outside the axis
-            tickmode='auto',  # Auto mode for tick spacing
             matches='x'  # Ensure the ticks match with the bottom axis
         ),
         yaxis=dict(
