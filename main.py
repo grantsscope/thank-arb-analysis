@@ -275,52 +275,40 @@ with onchain_metrics:
     # Step 3: Merge the two summaries into one dataframe
     merged_summary = pd.merge(before_july_summary, after_july_summary, on='project_name', how='outer', suffixes=('_before_july', '_after_july')).fillna(0)
     
-    # Step 4: Sort by highest total transactions (optional, but improves readability)
-    merged_summary['total_transactions'] = merged_summary['transaction_count_before_july'] + merged_summary['transaction_count_after_july']
-    merged_summary = merged_summary.sort_values(by='total_transactions', ascending=False)
+    # Step 4: Calculate percentage change ((after - before) / before) * 100
+    merged_summary['pct_change'] = ((merged_summary['transaction_count_after_july'] - merged_summary['transaction_count_before_july']) / 
+                                    merged_summary['transaction_count_before_july'].replace(0, 1)) * 100
     
-    # Step 5: Create the butterfly chart
-    fig = go.Figure()
+    # Step 5: Sort by highest positive percentage change
+    merged_summary = merged_summary.sort_values(by='pct_change', ascending=False)
+        
+        # Reshape the data for slope chart
+    df_slope = pd.melt(merged_summary, 
+                       id_vars=['project_name'], 
+                       value_vars=['transaction_count_before_july', 'transaction_count_after_july'],
+                       var_name='time_period', value_name='transaction_count')
     
-    # Add bar for 'Before July 1st' (left side of the butterfly chart)
-    fig.add_trace(go.Bar(
-        y=merged_summary['project_name'],
-        x=-merged_summary['transaction_count_before_july'],  # Negative values for left side
-        name='Transactions (Apr to June 2024)',
-        orientation='h',
-        marker_color='blue',
-        hovertext=merged_summary['project_name']
-    ))
+    # Rename time periods for better readability
+    df_slope['time_period'] = df_slope['time_period'].replace({
+        'transaction_count_before_july': 'Apr to June 2024',
+        'transaction_count_after_july': 'From July 1st, 2024'
+    })
     
-    # Add bar for 'After July 1st' (right side of the butterfly chart)
-    fig.add_trace(go.Bar(
-        y=merged_summary['project_name'],
-        x=merged_summary['transaction_count_after_july'],  # Positive values for right side
-        name='Transactions (From July 1st, 2024)',
-        orientation='h',
-        marker_color='green',
-        hovertext=merged_summary['project_name']
-    ))
+    # Create the slope chart
+    fig = px.line(df_slope, 
+                  x='time_period', 
+                  y='transaction_count', 
+                  color='project_name', 
+                  markers=True, 
+                  title='Slope Chart of Transaction Count Before and After July 1st, 2024 by Project')
     
-    # Step 6: Update layout for the butterfly chart
+    # Update layout for readability
     fig.update_layout(
-        title='Butterfly Chart of Transaction Count Before and After July 1st, 2024 by Project',
-        xaxis_title='Transaction Count',
-        yaxis_title='Projects',
-        barmode='overlay',  # Overlay bars for symmetrical comparison
-        xaxis=dict(tickvals=[-max(merged_summary['transaction_count_before_july']), max(merged_summary['transaction_count_after_july'])],  # Adjust tick values for symmetry
-                   tickmode='array', range=[-max(merged_summary['transaction_count_before_july'])*1.1, max(merged_summary['transaction_count_after_july'])*1.1]),  # Adjust range for symmetry
-        height=len(merged_summary) * 40 + 400,  # Adjust height for readability based on number of projects
-        bargap=0.15,  # Gap between bars
-        bargroupgap=0.1,
-        legend_title_text='Period',
-        hovermode='y unified'
+        xaxis_title='Time Period',
+        yaxis_title='Transaction Count',
+        height=len(merged_summary) * 40 + 400,
+        showlegend=False  # Optionally hide the legend if the chart gets too cluttered
     )
-    
-    # Increase the height of each row and adjust the size of the chart for better readability
-    fig.update_yaxes(tickfont=dict(size=12), automargin=True)  # Increase font size for the y-axis
-    fig.update_traces(marker_line_width=1.5, marker_line_color='black', opacity=0.85)  # Add border for better visibility
-
 
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
