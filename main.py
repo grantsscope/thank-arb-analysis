@@ -4,19 +4,36 @@ from datetime import datetime, timedelta
 import pytz
 import plotly.express as px
 import plotly.graph_objects as go
+import numpy as np
     
 # Set page configuration to wide layout
 st.set_page_config(layout="wide")
+
+def min_max_normalize(series):
+    return (series - series.min()) / (series.max() - series.min())
 
 def load_code_metrics_data():
     # Load the dataset
     df = pd.read_csv("./data/project_metrics.csv")
     
-    # Calculate the Development Activity Index
-    df['Development Activity Index'] = (df['commit_count_6_months'] * 0.5) + \
-                           (df['merged_pull_request_count_6_months'] * 0.3) + \
-                           (df['active_developer_count_6_months'] * 0.2)
-    
+    # Apply logarithmic transformation to commit count
+    df['log_commit_count'] = np.log1p(df['commit_count_6_months'])
+
+    # Normalize each metric
+    df['normalized_commits'] = min_max_normalize(df['log_commit_count'])
+    df['normalized_prs'] = min_max_normalize(df['merged_pull_request_count_6_months'])
+    df['normalized_devs'] = min_max_normalize(df['active_developer_count_6_months'])
+
+    # Calculate the new Development Activity Index
+    df['Development Activity Index'] = (
+        df['normalized_commits'] * 0.5 +
+        df['normalized_prs'] * 0.3 +
+        df['normalized_devs'] * 0.2
+    )
+
+    # Scale the index to a 0-100 range for easier interpretation
+    df['Development Activity Index'] = df['Development Activity Index'] * 100
+
     # Select and rename relevant columns
     df = df.rename(columns={
         'display_name': 'Project Name',
@@ -357,7 +374,3 @@ with onchain_metrics:
     
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
-
-
-
-
