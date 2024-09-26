@@ -412,7 +412,7 @@ with onchain_metrics:
     code_onchain_data = code_onchain_data.rename(columns={'Project Name': 'Project Name'})  # Ensure consistent naming
 
     # Calculate the sum of pre/post July transactions
-    code_onchain_data['Total Transactions'] = code_onchain_data['transaction_count_before_july'].fillna(0) + combined_data['transaction_count_after_july'].fillna(0)
+    code_onchain_data['Total Transactions'] = code_onchain_data['transaction_count_before_july'].fillna(0) + code_onchain_data['transaction_count_after_july'].fillna(0)
 
     # Select and rename the final columns
     final_data = code_onchain_data[['Project Name', 'Commit Count', 'Total Transactions']]
