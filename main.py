@@ -95,10 +95,27 @@ onchain_metrics, code_metrics = st.tabs(["Onchain Transactions", "Code Metrics"]
 with code_metrics:
     st.markdown("### What are the top projects based on development activities?")
     st.markdown("""
-    Projects are ranked according to their Development Activity Index, a composite metric derived from:
-    - **Code Commits** (50%)
-    - **Merged Pull Requests** (30%)
-    - **Active Developer Count** (20%)
+    ### Understanding the Development Activity Index
+    
+    The Development Activity Index is a custom metric designed to measure the overall coding activity of a project. It combines three key indicators of development activity:
+    
+    1. **Code Commits** (50% weight): The number of code changes submitted to the project.
+    2. **Merged Pull Requests** (30% weight): The number of code contributions successfully integrated into the project.
+    3. **Active Developer Count** (20% weight): The number of developers actively working on the project.
+    
+    **How it's calculated:**
+    1. We apply a logarithmic transformation to the commit count to balance the impact of projects with very high commit numbers.
+    2. Each metric is normalized to ensure fair comparison across projects of different sizes and activity levels.
+    3. The normalized metrics are then combined using the weights shown above.
+    4. The final score is scaled to a 0-100 range for easier interpretation.
+    
+    **Interpreting the Index:**
+    - A higher score indicates more development activity.
+    - Scores are relative within this group of projects, not absolute measures.
+    - A low score doesn't necessarily mean a project is inactive; it might be in a stable phase or have a different development model.
+    
+    **Why this matters:**
+    This index helps identify projects with high levels of coding activity, which can be an indicator of project health, community engagement, and ongoing development. However, it's important to consider this alongside other factors like project goals, maturity, and specific grant objectives.
     """)
     
     st.info("""
