@@ -402,7 +402,7 @@ with integrated_view:
 
     # Merge the dataframes
     code_onchain_data = pd.merge(
-        metrics_data[['Project Key', 'Commit Count']],
+        metrics_data[['Project Key', 'Development Activity Index']],
         merged_onchain_summary[['project_name', 'transaction_count_before_july', 'transaction_count_after_july']],
         left_on='Project Key',
         right_on='project_name',
@@ -416,27 +416,27 @@ with integrated_view:
     code_onchain_data['Total Transactions'] = code_onchain_data['transaction_count_before_july'].fillna(0) + code_onchain_data['transaction_count_after_july'].fillna(0)
 
     # Select and rename the final columns
-    final_data = code_onchain_data[['Project Key', 'Commit Count', 'Total Transactions']]
+    final_data = code_onchain_data[['Project Key', 'Development Activity Index', 'Total Transactions']]
 
     # Convert to numeric and handle any remaining NaN values
-    final_data['Commit Count'] = pd.to_numeric(final_data['Commit Count'], errors='coerce').fillna(0).astype(int)
+    final_data['Development Activity Index'] = pd.to_numeric(final_data['Development Activity Index'], errors='coerce').fillna(0).astype(int)
     final_data['Total Transactions'] = final_data['Total Transactions'].fillna(0).astype(int)
 
     # Sort by Commit Count in descending order
-    final_data = final_data.sort_values('Commit Count', ascending=False)
+    final_data = final_data.sort_values('Development Activity Index', ascending=False)
 
         # Create the scatter plot
     fig = px.scatter(
         final_data,
         x='Total Transactions',
-        y='Commit Count',
+        y='Development Activity Index',
         text='Project Key',
-        log_y=True,  # Use log scale for Y-axis
+        log_x=True,  # Use log scale for Y-axis
         labels={
             'Total Transactions': 'Total Transactions',
-            'Commit Count': 'Log of Commit Count'
+            'Development Activity Index': 'Development Activity Index'
         },
-        title='Project Comparison: Commit Count vs Total Transactions'
+        title='Project Comparison: Development Activity Index vs Total Transactions'
     )
 
     # Customize the layout
@@ -446,7 +446,7 @@ with integrated_view:
     )
     fig.update_layout(
         xaxis_title='Total Transactions',
-        yaxis_title='Log of Commit Count',
+        yaxis_title='Development Activity Index',
         height=600,
         width=800
     )
@@ -462,7 +462,7 @@ with integrated_view:
         height=1000,
         column_config={
             "Project Key": st.column_config.TextColumn(width="medium"),
-            "Commit Count": st.column_config.NumberColumn(format="%d"),
+            "Development Activity Index": st.column_config.NumberColumn(format="%d"),
             "Total Transactions": st.column_config.NumberColumn(format="%d")
         },
         hide_index=True
