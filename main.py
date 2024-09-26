@@ -498,7 +498,8 @@ with overall_summary:
     st.dataframe(
         combined_data,
         use_container_width=True,
-        height=600,
+        height=1600,
+        hide_index=True,
         column_config={
             "Transactions Before July 1st (3 months)": st.column_config.NumberColumn(format="%d"),
             "Transactions After July 1st": st.column_config.NumberColumn(format="%d")
