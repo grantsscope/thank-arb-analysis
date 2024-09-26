@@ -457,7 +457,28 @@ with overall_summary:
         'transaction_count_after_july': 'Transactions After July 1st',
         'transaction_count_before_july': 'Transactions Before July 1st'
     })
+
+    # Reorder the columns
+    column_order = [
+        'Grantee',
+        'OSO Project Name',
+        'Program',
+        'Development Activity Index',
+        'Days Since Last Commit',
+        'Transactions Before July 1st',
+        'Transactions After July 1st',
+        'Transaction Count % Change'
+    ]
     
+    # Reindex the dataframe with the new column order
+    combined_data = combined_data.reindex(columns=column_order)
+    
+    # Round the 'Transaction Count % Change' column
+    combined_data['Transaction Count % Change'] = combined_data['Transaction Count % Change'].round().astype('Int64')
+    
+    # Rename 'Transactions Before July 1st' to include "(3 months)"
+    combined_data = combined_data.rename(columns={'Transactions Before July 1st': 'Transactions Before July 1st (3 months)'})
+
     # Display the dataframe
     st.dataframe(
         combined_data,
@@ -466,10 +487,3 @@ with overall_summary:
         height = 1600
     )
 
-    # Display the dataframe
-    st.dataframe(
-        top_grantee_data,
-        use_container_width=True,
-        hide_index=True,
-        height = 1600
-    )
