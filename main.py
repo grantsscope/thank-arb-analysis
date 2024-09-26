@@ -458,18 +458,21 @@ with overall_summary:
         'transaction_count_before_july': 'Transactions Before July 1st (3 months)'
     })
     
-    # Convert transaction columns to numeric, replacing any non-numeric values with NaN
-    combined_data['Transactions Before July 1st (3 months)'] = pd.to_numeric(combined_data['Transactions Before July 1st (3 months)'], errors='coerce')
-    combined_data['Transactions After July 1st'] = pd.to_numeric(combined_data['Transactions After July 1st'], errors='coerce')
-
+    # Convert transaction columns to numeric, replacing any non-numeric values with 0
+    combined_data['Transactions Before July 1st (3 months)'] = pd.to_numeric(combined_data['Transactions Before July 1st (3 months)'], errors='coerce').fillna(0)
+    combined_data['Transactions After July 1st'] = pd.to_numeric(combined_data['Transactions After July 1st'], errors='coerce').fillna(0)
+    
+    # Replace 0 with 1 in the 'Before July' column for percentage calculation
+    transactions_before = combined_data['Transactions Before July 1st (3 months)'].replace(0, 1)
+    
     # Calculate percentage change
     combined_data['Transaction Count % Change'] = ((combined_data['Transactions After July 1st'] - combined_data['Transactions Before July 1st (3 months)']) / 
-                                                combined_data['Transactions Before July 1st (3 months)'].replace(0, np.nan)) * 100
-
-    # Round the percentage change and convert to nullable integer
+                                                   transactions_before) * 100
+    
+    # Round the percentage change and convert to integer
     combined_data['Transaction Count % Change'] = combined_data['Transaction Count % Change'].round().astype('Int64')
-
-    # Reorder the columns
+    
+    # Reorder the columns (as before)
     column_order = [
         'Grantee',
         'OSO Project Name',
@@ -480,15 +483,19 @@ with overall_summary:
         'Transactions After July 1st',
         'Transaction Count % Change'
     ]
-
+    
     # Reindex the dataframe with the new column order
     combined_data = combined_data.reindex(columns=column_order)
-
+    
     # Display the dataframe
     st.dataframe(
         combined_data,
         use_container_width=True,
-        hide_index=True,
-        height = 1600
+        height=1600,
+        column_config={
+            "Transactions Before July 1st (3 months)": st.column_config.NumberColumn(format="%d"),
+            "Transactions After July 1st": st.column_config.NumberColumn(format="%d"),
+            "Transaction Count % Change": st.column_config.NumberColumn(format="%d%%")
+        }
     )
 
