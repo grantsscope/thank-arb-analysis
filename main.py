@@ -418,14 +418,14 @@ with overall_summary:
 
     def days_ago(date_value):
         if pd.isnull(date_value) or date_value == 'No data':
-            return np.iinfo(np.int32).max  # Use maximum 32-bit integer instead of infinity
+            return pd.NA
         try:
             if isinstance(date_value, str):
                 commit_date = datetime.strptime(date_value, '%Y-%m-%d %H:%M:%S%z')
             elif isinstance(date_value, pd.Timestamp):
                 commit_date = date_value.to_pydatetime()
             else:
-                return np.iinfo(np.int32).max  # Use maximum 32-bit integer for invalid date types
+                return pd.NA
             
             # Ensure the date has timezone information
             if commit_date.tzinfo is None:
@@ -434,9 +434,9 @@ with overall_summary:
             days = (datetime.now(timezone.utc) - commit_date).days
             return days
         except ValueError:
-            return np.iinfo(np.int32).max  # Use maximum 32-bit integer for invalid dates
+            return pd.NA
     
-    merged_data['Days Since Last Commit'] = merged_data['Last Commit'].apply(days_ago).astype('int32')
+    merged_data['Days Since Last Commit'] = merged_data['Last Commit'].apply(days_ago).astype('Int64')
     merged_data = merged_data.drop('Last Commit', axis=1)  # Remove the original 'Last Commit' column
     
     # Display the dataframe
