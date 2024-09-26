@@ -525,7 +525,7 @@ with overall_summary:
         value = safe_numeric(value)
         if pd.isna(value):
             return ''
-        if value < 30:
+        if value > 30:
             return 'color: red'
         return ''
     
