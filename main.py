@@ -432,11 +432,12 @@ with overall_summary:
                 commit_date = commit_date.replace(tzinfo=timezone.utc)
             
             days = (datetime.now(timezone.utc) - commit_date).days
-            return f"{days} days ago"
+            return days
         except ValueError:
             return 'Invalid Date'
 
-    merged_data['Last Commit'] = merged_data['Last Commit'].apply(days_ago)
+    merged_data['Days Since Last Commit'] = merged_data['Last Commit'].apply(days_ago)
+    merged_data = merged_data.drop('Last Commit', axis=1)  # Remove the original 'Last Commit' column
 
     # Display the dataframe
     st.dataframe(
