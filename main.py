@@ -480,7 +480,7 @@ with integrated_view:
 with overall_summary:
     
     st.markdown("""
-    ## Top Grantee Performance Overview
+    ### Top Grantee Performance Overview
 
     This table shows the top grantees by program, combining development metrics with onchain transaction data. Here's what you're looking at:
 
