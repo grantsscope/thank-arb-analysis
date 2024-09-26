@@ -416,13 +416,22 @@ with overall_summary:
     # Format Development Activity Index without decimal
     merged_data['Development Activity Index'] = merged_data['Development Activity Index'].apply(lambda x: f"{x:.0f}" if pd.notnull(x) else 'No Data')
 
-    # Update Last Commit to show days ago
-    def days_ago(date_string):
-        if pd.isnull(date_string) or date_string == 'No data':
+    def days_ago(date_value):
+        if pd.isnull(date_value) or date_value == 'No data':
             return 'No Data'
         try:
-            commit_date = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S%z')
-            days = (datetime.now(commit_date.tzinfo) - commit_date).days
+            if isinstance(date_value, str):
+                commit_date = datetime.strptime(date_value, '%Y-%m-%d %H:%M:%S%z')
+            elif isinstance(date_value, pd.Timestamp):
+                commit_date = date_value.to_pydatetime()
+            else:
+                return 'Invalid Date Type'
+            
+            # Ensure the date has timezone information
+            if commit_date.tzinfo is None:
+                commit_date = commit_date.replace(tzinfo=timezone.utc)
+            
+            days = (datetime.now(timezone.utc) - commit_date).days
             return f"{days} days ago"
         except ValueError:
             return 'Invalid Date'
