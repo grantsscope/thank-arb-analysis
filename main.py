@@ -494,11 +494,18 @@ with overall_summary:
     # Reindex the dataframe with the new column order
     combined_data = combined_data.reindex(columns=column_order)
 
+    # Function to safely convert to numeric
+    def safe_numeric(value):
+        try:
+            return pd.to_numeric(value)
+        except:
+            return np.nan
+    
     # Function to format Development Activity Index
     def format_dev_activity_index(value):
+        value = safe_numeric(value)
         if pd.isna(value):
             return ''
-        value = float(value)
         if value < 20:
             return 'color: red'
         elif value > 50:
@@ -515,15 +522,19 @@ with overall_summary:
     
     # Function to format Days Since Last Commit
     def format_days_since_last_commit(value):
+        value = safe_numeric(value)
         if pd.isna(value):
             return ''
-        value = float(value)
         if value > 30:
             return 'color: red'
         return ''
     
     # Function to apply styling to the entire dataframe
     def style_dataframe(df):
+        # Convert columns to numeric
+        df['Development Activity Index'] = df['Development Activity Index'].apply(safe_numeric)
+        df['Days Since Last Commit'] = df['Days Since Last Commit'].apply(safe_numeric)
+        
         return df.style.applymap(format_dev_activity_index, subset=['Development Activity Index']) \
                        .applymap(format_change_in_transactions, subset=['Change in Transactions']) \
                        .applymap(format_days_since_last_commit, subset=['Days Since Last Commit']) \
@@ -532,7 +543,7 @@ with overall_summary:
                            'Days Since Last Commit': '{:.0f}',
                            'Transactions Before July 1st (3 months)': '{:,.0f}',
                            'Transactions After July 1st': '{:,.0f}'
-                       })
+                       }, na_rep="")
 
     
     # Display the dataframe
