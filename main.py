@@ -91,7 +91,7 @@ st.markdown(f"\n In the last 6 months, these {project_count} projects: \
             \n - Closed over {total_issues_closed:,} issues (and created {total_issues_opened:,} new ones) \
             \n - Merged over {total_merged_PR:,} pull requests (and opened {total_open_PR:,} new ones)")
 
-overall_summary, onchain_metrics, code_metrics = st.tabs(["Overall Summary", "Onchain Transactions", "Code Metrics"])
+overall_summary, onchain_metrics, code_metrics = st.tabs(["Top Grantee Summary", "Onchain Transactions", "Code Metrics"])
 
 with code_metrics:
     st.markdown("### What are the top projects based on development activities in the last 6 months?")
@@ -414,7 +414,7 @@ with overall_summary:
     merged_data['OSO Project Name'] = merged_data['OSO Project Name'].fillna('No Data')
 
     # Format Development Activity Index without decimal
-    merged_data['Development Activity Index'] = merged_data['Development Activity Index'].apply(lambda x: f"{x:.0f}" if pd.notnull(x) else 'No Data')
+    merged_data['Development Activity Index'] = merged_data['Development Activity Index'].apply(lambda x: f"{x:.0f}" if pd.notnull(x) else pd.NA)
 
     def days_ago(date_value):
         if pd.isnull(date_value) or date_value == 'No data':
