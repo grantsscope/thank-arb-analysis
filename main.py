@@ -409,12 +409,25 @@ with overall_summary:
     # If you want to drop the redundant 'Project Key' column after merging
     merged_data = merged_data.drop('Project Key', axis=1)
 
-    # If you want to rename 'project_name' to 'Project Name' for consistency
-    merged_data = merged_data.rename(columns={'project_name': 'Project Name'})
+    # Rename 'Project Name' to 'OSO Project Name' and fill blank values
+    merged_data = merged_data.rename(columns={'Project Name': 'OSO Project Name'})
+    merged_data['OSO Project Name'] = merged_data['OSO Project Name'].fillna('No Data')
 
-    # Handle any missing values if there were projects in summary that didn't match in metrics_data
-    merged_data['Development Activity Index'] = merged_data['Development Activity Index'].fillna('No data')
-    merged_data['Last Commit'] = merged_data['Last Commit'].fillna('No data')
+    # Format Development Activity Index without decimal
+    merged_data['Development Activity Index'] = merged_data['Development Activity Index'].apply(lambda x: f"{x:.0f}" if pd.notnull(x) else 'No Data')
+
+    # Update Last Commit to show days ago
+    def days_ago(date_string):
+        if pd.isnull(date_string) or date_string == 'No data':
+            return 'No Data'
+        try:
+            commit_date = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S%z')
+            days = (datetime.now(commit_date.tzinfo) - commit_date).days
+            return f"{days} days ago"
+        except ValueError:
+            return 'Invalid Date'
+
+    merged_data['Last Commit'] = merged_data['Last Commit'].apply(days_ago)
 
     # Display the dataframe
     st.dataframe(
