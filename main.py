@@ -455,8 +455,19 @@ with overall_summary:
     combined_data = combined_data.rename(columns={
         'pct_change': 'Transaction Count % Change',
         'transaction_count_after_july': 'Transactions After July 1st',
-        'transaction_count_before_july': 'Transactions Before July 1st'
+        'transaction_count_before_july': 'Transactions Before July 1st (3 months)'
     })
+    
+    # Convert transaction columns to numeric, replacing any non-numeric values with NaN
+    combined_data['Transactions Before July 1st (3 months)'] = pd.to_numeric(combined_data['Transactions Before July 1st (3 months)'], errors='coerce')
+    combined_data['Transactions After July 1st'] = pd.to_numeric(combined_data['Transactions After July 1st'], errors='coerce')
+
+    # Calculate percentage change
+    combined_data['Transaction Count % Change'] = ((combined_data['Transactions After July 1st'] - combined_data['Transactions Before July 1st (3 months)']) / 
+                                                combined_data['Transactions Before July 1st (3 months)'].replace(0, np.nan)) * 100
+
+    # Round the percentage change and convert to nullable integer
+    combined_data['Transaction Count % Change'] = combined_data['Transaction Count % Change'].round().astype('Int64')
 
     # Reorder the columns
     column_order = [
@@ -465,19 +476,13 @@ with overall_summary:
         'Program',
         'Development Activity Index',
         'Days Since Last Commit',
-        'Transactions Before July 1st',
+        'Transactions Before July 1st (3 months)',
         'Transactions After July 1st',
         'Transaction Count % Change'
     ]
-    
+
     # Reindex the dataframe with the new column order
     combined_data = combined_data.reindex(columns=column_order)
-    
-    # Round the 'Transaction Count % Change' column
-    combined_data['Transaction Count % Change'] = combined_data['Transaction Count % Change'].round().astype('Int64')
-    
-    # Rename 'Transactions Before July 1st' to include "(3 months)"
-    combined_data = combined_data.rename(columns={'Transactions Before July 1st': 'Transactions Before July 1st (3 months)'})
 
     # Display the dataframe
     st.dataframe(
