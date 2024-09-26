@@ -458,51 +458,50 @@ with overall_summary:
         'transaction_count_before_july': 'Transactions Before July 1st (3 months)'
     })
     
-# Convert transaction columns to numeric, keeping NaN values
-combined_data['Transactions Before July 1st (3 months)'] = pd.to_numeric(combined_data['Transactions Before July 1st (3 months)'], errors='coerce')
-combined_data['Transactions After July 1st'] = pd.to_numeric(combined_data['Transactions After July 1st'], errors='coerce')
-
-# Function to determine change direction
-def change_direction(before, after):
-    if pd.isna(before) or pd.isna(after):
-        return ''
-    if after > before:
-        return '⬆️'  # Up arrow
-    elif after < before:
-        return '⬇️'  # Down arrow
-    else:
-        return '↔️'  # Right arrow for no change
-
-# Add new column for change direction
-combined_data['Change in Transactions'] = combined_data.apply(
-    lambda row: change_direction(row['Transactions Before July 1st (3 months)'], row['Transactions After July 1st']),
-    axis=1
-)
-
-# Reorder the columns
-column_order = [
-    'Grantee',
-    'OSO Project Name',
-    'Program',
-    'Development Activity Index',
-    'Days Since Last Commit',
-    'Transactions Before July 1st (3 months)',
-    'Transactions After July 1st',
-    'Change in Transactions'
-]
-
-# Reindex the dataframe with the new column order
-combined_data = combined_data.reindex(columns=column_order)
-
-# Display the dataframe
-st.dataframe(
-    combined_data,
-    use_container_width=True,
-    height=600,
-    column_config={
-        "Transactions Before July 1st (3 months)": st.column_config.NumberColumn(format="%d"),
-        "Transactions After July 1st": st.column_config.NumberColumn(format="%d"),
-        "Change in Transactions": st.column_config.TextColumn(width="small")
-    }
-)
-
+    # Convert transaction columns to numeric, keeping NaN values
+    combined_data['Transactions Before July 1st (3 months)'] = pd.to_numeric(combined_data['Transactions Before July 1st (3 months)'], errors='coerce')
+    combined_data['Transactions After July 1st'] = pd.to_numeric(combined_data['Transactions After July 1st'], errors='coerce')
+    
+    # Function to determine change direction with colored HTML
+    def change_direction(before, after):
+        if pd.isna(before) or pd.isna(after):
+            return ''
+        if after > before:
+            return '<span style="color: green;">↑</span>'  # Green up arrow
+        elif after < before:
+            return '<span style="color: red;">↓</span>'  # Red down arrow
+        else:
+            return '→'  # Right arrow for no change
+    
+    # Add new column for change direction
+    combined_data['Change in Transactions'] = combined_data.apply(
+        lambda row: change_direction(row['Transactions Before July 1st (3 months)'], row['Transactions After July 1st']),
+        axis=1
+    )
+    
+    # Reorder the columns
+    column_order = [
+        'Grantee',
+        'OSO Project Name',
+        'Program',
+        'Development Activity Index',
+        'Days Since Last Commit',
+        'Transactions Before July 1st (3 months)',
+        'Transactions After July 1st',
+        'Change in Transactions'
+    ]
+    
+    # Reindex the dataframe with the new column order
+    combined_data = combined_data.reindex(columns=column_order)
+    
+    # Display the dataframe
+    st.dataframe(
+        combined_data,
+        use_container_width=True,
+        height=600,
+        column_config={
+            "Transactions Before July 1st (3 months)": st.column_config.NumberColumn(format="%d"),
+            "Transactions After July 1st": st.column_config.NumberColumn(format="%d"),
+            "Change in Transactions": st.column_config.Column(width="small")
+        }
+    )
