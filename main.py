@@ -462,16 +462,16 @@ with overall_summary:
     combined_data['Transactions Before July 1st (3 months)'] = pd.to_numeric(combined_data['Transactions Before July 1st (3 months)'], errors='coerce')
     combined_data['Transactions After July 1st'] = pd.to_numeric(combined_data['Transactions After July 1st'], errors='coerce')
     
-    # Function to determine change direction with colored HTML
+    # Function to determine change direction with colored Unicode symbols
     def change_direction(before, after):
         if pd.isna(before) or pd.isna(after):
             return ''
         if after > before:
-            return '<span style="color: green;">↑</span>'  # Green up arrow
+            return '🟩'  # Green circle for increase
         elif after < before:
-            return '<span style="color: red;">↓</span>'  # Red down arrow
+            return '🔻'  # Red circle for decrease
         else:
-            return '→'  # Right arrow for no change
+            return '🔷'  # White circle for no change
     
     # Add new column for change direction
     combined_data['Change in Transactions'] = combined_data.apply(
@@ -501,7 +501,6 @@ with overall_summary:
         height=600,
         column_config={
             "Transactions Before July 1st (3 months)": st.column_config.NumberColumn(format="%d"),
-            "Transactions After July 1st": st.column_config.NumberColumn(format="%d"),
-            "Change in Transactions": st.column_config.Column(width="small")
+            "Transactions After July 1st": st.column_config.NumberColumn(format="%d")
         }
     )
