@@ -396,6 +396,48 @@ with onchain_metrics:
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
 
+    ## Test of onchain and code metrics can be combined
+
+    # Merge the dataframes
+    code_onchain_data = pd.merge(
+        metrics_data[['Project Name', 'Commit Count']],
+        merged_onchain_summary[['project_name', 'transaction_count_before_july', 'transaction_count_after_july']],
+        left_on='Project Name',
+        right_on='project_name',
+        how='inner'  # Use outer join to keep all projects from both dataframes
+    )
+
+    # Clean up the merged dataframe
+    code_onchain_data = code_onchain_data.drop('project_name', axis=1)  # Remove the duplicate project name column
+    code_onchain_data = code_onchain_data.rename(columns={'Project Name': 'Project Name'})  # Ensure consistent naming
+
+    # Calculate the sum of pre/post July transactions
+    code_onchain_data['Total Transactions'] = code_onchain_data['transaction_count_before_july'].fillna(0) + combined_data['transaction_count_after_july'].fillna(0)
+
+    # Select and rename the final columns
+    final_data = code_onchain_data[['Project Name', 'Commit Count', 'Total Transactions']]
+
+    # Convert to numeric and handle any remaining NaN values
+    final_data['Commit Count'] = pd.to_numeric(final_data['Commit Count'], errors='coerce').fillna(0).astype(int)
+    final_data['Total Transactions'] = final_data['Total Transactions'].fillna(0).astype(int)
+
+    # Sort by Commit Count in descending order
+    final_data = final_data.sort_values('Commit Count', ascending=False)
+
+
+    # Display the entire dataframe
+    st.dataframe(
+        final_data,
+        use_container_width=True,
+        height=1000,
+        column_config={
+            "Project Name": st.column_config.TextColumn(width="medium"),
+            "Commit Count": st.column_config.NumberColumn(format="%d"),
+            "Total Transactions": st.column_config.NumberColumn(format="%d")
+        },
+        hide_index=True
+    )
+
 with overall_summary:
     summary = pd.read_csv("./data/Info by program.csv")
 
