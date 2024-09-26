@@ -400,7 +400,7 @@ with onchain_metrics:
 
     # Merge the dataframes
     code_onchain_data = pd.merge(
-        metrics_data[['Project Name', 'Commit Count']],
+        metrics_data[['Project Key', 'Commit Count']],
         merged_onchain_summary[['project_name', 'transaction_count_before_july', 'transaction_count_after_july']],
         left_on='Project Name',
         right_on='project_name',
