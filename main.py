@@ -102,24 +102,24 @@ with code_metrics:
     """)
 
     with st.expander("Understanding the Development Activity Index 👇"):
-    st.markdown("""
-        The composite index combines three key indicators of development activity:
-        
-        1. **Code Commits** (50% weight): The number of code changes submitted to the project.
-        2. **Merged Pull Requests** (30% weight): The number of code contributions successfully integrated into the project.
-        3. **Active Developer Count** (20% weight): The number of developers actively working on the project.
-        
-        **How it's calculated:**
-        1. We apply a logarithmic transformation to the commit count to balance the impact of projects with very high commit numbers.
-        2. Each metric is normalized to ensure fair comparison across projects of different sizes and activity levels.
-        3. The normalized metrics are then combined using the weights shown above.
-        4. The final score is scaled to a 0-100 range for easier interpretation.
-        
-        **Interpreting the Index:**
-        - A higher score indicates more development activity.
-        - Scores are relative within this group of projects, not absolute measures.
-        - A low score doesn't necessarily mean a project is inactive; it might be in a stable phase or have a different development model.
-    """)
+        st.markdown("""
+            The composite index combines three key indicators of development activity:
+            
+            1. **Code Commits** (50% weight): The number of code changes submitted to the project.
+            2. **Merged Pull Requests** (30% weight): The number of code contributions successfully integrated into the project.
+            3. **Active Developer Count** (20% weight): The number of developers actively working on the project.
+            
+            **How it's calculated:**
+            1. We apply a logarithmic transformation to the commit count to balance the impact of projects with very high commit numbers.
+            2. Each metric is normalized to ensure fair comparison across projects of different sizes and activity levels.
+            3. The normalized metrics are then combined using the weights shown above.
+            4. The final score is scaled to a 0-100 range for easier interpretation.
+            
+            **Interpreting the Index:**
+            - A higher score indicates more development activity.
+            - Scores are relative within this group of projects, not absolute measures.
+            - A low score doesn't necessarily mean a project is inactive; it might be in a stable phase or have a different development model.
+            """)
     
     st.info("""
     **Note on Development Activity Index:** The Development Activity Index is a proposed custom composite metric tailored to reflect coding activities. Depending on grant objectives, different combinations of metrics might be employed to more accurately evaluate grantee performance.
