@@ -398,6 +398,28 @@ with onchain_metrics:
 
 with integrated_view:
 
+    # User-friendly explanation
+    st.markdown("""
+    ### Understanding the Project Comparison Chart
+
+    This chart compares projects based on two key metrics:
+    - **Development Activity Index**: Measures the coding activity of a project.
+    - **Total Transactions**: Represents the project's on-chain usage.
+
+    #### Key Insights:
+    1. **Top Right**: Projects in this area are thriving both in development and adoption.
+    2. **Top Left**: High development activity but lower transaction count. These projects might be building actively but haven't gained widespread usage yet.
+    3. **Bottom Right**: High transaction count but lower development activity. These could be established projects with a strong user base but less active development.
+    4. **Bottom Left**: Lower scores in both metrics. These projects might need attention or could be in early stages.
+
+    #### Why It Matters:
+    - This visualization helps identify which projects are succeeding in both development and real-world usage.
+    - It can highlight potential mismatches between development efforts and user adoption.
+    - Use this to guide resource allocation, identify projects that need support, or spot rising stars in the ecosystem.
+
+    Hover over points to see project details, and consider investigating outliers or clusters for deeper insights.
+    """)
+
     ## Test of onchain and code metrics can be combined
 
     # Merge the dataframes
