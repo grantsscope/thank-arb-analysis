@@ -93,7 +93,7 @@ st.markdown(f"\n In the last 6 months, these {project_count} projects: \
 onchain_metrics, code_metrics = st.tabs(["Onchain Transactions", "Code Metrics"])
 
 with code_metrics:
-    st.markdown("### What are the top projects based on development activities?")
+    st.markdown("### What are the top projects based on development activities in the last 6 months?")
     st.markdown("""
     The Development Activity Index is a custom metric designed to measure the overall coding activity of a project. \
     This index helps identify projects with high levels of coding activity, which can be an indicator of project health, \
