@@ -91,7 +91,7 @@ st.markdown(f"\n In the last 6 months, these {project_count} projects: \
             \n - Closed over {total_issues_closed:,} issues (and created {total_issues_opened:,} new ones) \
             \n - Merged over {total_merged_PR:,} pull requests (and opened {total_open_PR:,} new ones)")
 
-overall_summary, onchain_metrics, code_metrics = st.tabs(["Top Grantee Summary", "Onchain Transactions", "Code Metrics"])
+overall_summary, integrated_view, onchain_metrics, code_metrics = st.tabs(["Top Grantee Summary", "Integrated View", "Onchain Transactions", "Code Metrics"])
 
 with code_metrics:
     st.markdown("### What are the top projects based on development activities in the last 6 months?")
@@ -396,6 +396,8 @@ with onchain_metrics:
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
 
+with integrated_view:
+
     ## Test of onchain and code metrics can be combined
 
     # Merge the dataframes
@@ -422,6 +424,35 @@ with onchain_metrics:
 
     # Sort by Commit Count in descending order
     final_data = final_data.sort_values('Commit Count', ascending=False)
+
+        # Create the scatter plot
+    fig = px.scatter(
+        final_data,
+        x='Total Transactions',
+        y='Commit Count',
+        text='Project Key',
+        log_y=True,  # Use log scale for Y-axis
+        labels={
+            'Total Transactions': 'Total Transactions',
+            'Commit Count': 'Log of Commit Count'
+        },
+        title='Project Comparison: Commit Count vs Total Transactions'
+    )
+
+    # Customize the layout
+    fig.update_traces(
+        textposition='top center',
+        marker=dict(size=10),
+    )
+    fig.update_layout(
+        xaxis_title='Total Transactions',
+        yaxis_title='Log of Commit Count',
+        height=600,
+        width=800
+    )
+
+    # Display the plot
+    st.plotly_chart(fig, use_container_width=True)
 
 
     # Display the entire dataframe
