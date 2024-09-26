@@ -36,6 +36,7 @@ def load_code_metrics_data():
 
     # Select and rename relevant columns
     df = df.rename(columns={
+        'project_name': 'Project Key',
         'display_name': 'Project Name',
         'repository_count': 'Repository Count',
         'commit_count_6_months': 'Commit Count',
@@ -50,7 +51,7 @@ def load_code_metrics_data():
     })
 
     columns = [
-        'Project Name', 'Development Activity Index', 'Commit Count', 'Active Developer Count', '# of Merged PRs',
+        'Project Key','Project Name', 'Development Activity Index', 'Commit Count', 'Active Developer Count', '# of Merged PRs',
         'Contributor Count', 'New Contributor Count', 'Repository Count',
         '# of Open PRs', 
         '# of Issues Opened', '# of Issues Closed', 'Last Commit'
@@ -90,7 +91,7 @@ st.markdown(f"\n In the last 6 months, these {project_count} projects: \
             \n - Closed over {total_issues_closed:,} issues (and created {total_issues_opened:,} new ones) \
             \n - Merged over {total_merged_PR:,} pull requests (and opened {total_open_PR:,} new ones)")
 
-onchain_metrics, code_metrics = st.tabs(["Onchain Transactions", "Code Metrics"])
+overall_summary, onchain_metrics, code_metrics = st.tabs(["Overall Summary", "Onchain Transactions", "Code Metrics"])
 
 with code_metrics:
     st.markdown("### What are the top projects based on development activities in the last 6 months?")
@@ -394,3 +395,30 @@ with onchain_metrics:
     
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
+
+with overall_summary:
+    summary = pd.read_csv("./data/Info by program.csv")
+
+    # Merge summary with metrics_data
+    merged_data = pd.merge(summary, 
+                        metrics_data[['Project Key', 'Development Activity Index', 'Last Commit']], 
+                        left_on='project_name', 
+                        right_on='Project Key', 
+                        how='left')
+
+    # If you want to drop the redundant 'Project Key' column after merging
+    merged_data = merged_data.drop('Project Key', axis=1)
+
+    # If you want to rename 'project_name' to 'Project Name' for consistency
+    merged_data = merged_data.rename(columns={'project_name': 'Project Name'})
+
+    # Handle any missing values if there were projects in summary that didn't match in metrics_data
+    merged_data['Development Activity Index'] = merged_data['Development Activity Index'].fillna('No data')
+    merged_data['Last Commit'] = merged_data['Last Commit'].fillna('No data')
+
+    # Display the dataframe
+    st.dataframe(
+        merged_data,
+        use_container_width=True,
+        hide_index=True
+    )
