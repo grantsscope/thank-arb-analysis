@@ -410,7 +410,7 @@ with overall_summary:
     merged_data = merged_data.drop('Project Key', axis=1)
 
     # Rename 'Project Name' to 'OSO Project Name' and fill blank values
-    merged_data = merged_data.rename(columns={'Project Name': 'OSO Project Name'})
+    merged_data = merged_data.rename(columns={'project_name': 'OSO Project Name'})
     merged_data['OSO Project Name'] = merged_data['OSO Project Name'].fillna('No Data')
 
     # Format Development Activity Index without decimal
