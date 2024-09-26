@@ -447,26 +447,13 @@ with integrated_view:
     fig.update_layout(
         xaxis_title='Total Transactions',
         yaxis_title='Development Activity Index',
-        height=600,
+        height=800,
         width=800
     )
 
     # Display the plot
     st.plotly_chart(fig, use_container_width=True)
 
-
-    # Display the entire dataframe
-    st.dataframe(
-        final_data,
-        use_container_width=True,
-        height=1000,
-        column_config={
-            "Project Key": st.column_config.TextColumn(width="medium"),
-            "Development Activity Index": st.column_config.NumberColumn(format="%d"),
-            "Total Transactions": st.column_config.NumberColumn(format="%d")
-        },
-        hide_index=True
-    )
 
 with overall_summary:
     summary = pd.read_csv("./data/Info by program.csv")
