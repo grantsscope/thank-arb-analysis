@@ -478,6 +478,31 @@ with integrated_view:
 
 
 with overall_summary:
+    
+    st.markdown("""
+    ## Top Grantee Performance Overview
+
+    This table shows the top grantees by program, combining development metrics with onchain transaction data. Here's what you're looking at:
+
+    - **Development Activity Index**: Measures coding intensity (higher is better).
+      - <span style="color: green;">Green</span>: High activity (>50)
+      - <span style="color: red;">Red</span>: Low activity (<20)
+    
+    - **Days Since Last Commit**: Indicates how recently the project was updated.
+      - <span style="color: red;">Red</span>: No recent activity (>30 days)
+    
+    - **Transactions**: Compares on-chain activity before and after July 1st.
+      - 🟩: Increase in transactions
+      - 🔻: Decrease in transactions
+      - 🔷: No significant change
+
+    This data helps us identify:
+    1. Which projects are actively developing and gaining traction?
+    2. Where might we need to provide additional support or guidance?
+
+    Use the sorting and filtering options to explore the data (hover on the top right of the table for options)
+    """, unsafe_allow_html=True)
+    
     summary = pd.read_csv("./data/Info by program.csv")
 
     # Merge summary with metrics_data
