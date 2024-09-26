@@ -534,6 +534,9 @@ with overall_summary:
         # Convert columns to numeric
         df['Development Activity Index'] = df['Development Activity Index'].apply(safe_numeric)
         df['Days Since Last Commit'] = df['Days Since Last Commit'].apply(safe_numeric)
+
+        # Sort the dataframe by Development Activity Index in descending order
+        df = df.sort_values('Development Activity Index', ascending=False)
         
         return df.style.applymap(format_dev_activity_index, subset=['Development Activity Index']) \
                        .applymap(format_change_in_transactions, subset=['Change in Transactions']) \
