@@ -326,52 +326,52 @@ with onchain_metrics:
     after_july_summary = df_after_july.groupby('project_name')['transaction_count'].sum().reset_index()
     
     # Merge the two summaries into one dataframe
-    merged_summary = pd.merge(before_july_summary, after_july_summary, on='project_name', how='outer', suffixes=('_before_july', '_after_july')).fillna(0)
+    merged_onchain_summary = pd.merge(before_july_summary, after_july_summary, on='project_name', how='outer', suffixes=('_before_july', '_after_july')).fillna(0)
     
     # Calculate percentage change ((after - before) / before) * 100
-    merged_summary['pct_change'] = ((merged_summary['transaction_count_after_july'] - merged_summary['transaction_count_before_july']) / 
-                                    merged_summary['transaction_count_before_july'].replace(0, 1)) * 100
+    merged_onchain_summary['pct_change'] = ((merged_onchain_summary['transaction_count_after_july'] - merged_onchain_summary['transaction_count_before_july']) / 
+                                    merged_onchain_summary['transaction_count_before_july'].replace(0, 1)) * 100
     
     # Sort the data by percentage change in descending order (highest to lowest)
-    merged_summary = merged_summary.sort_values(by='pct_change', ascending=False)
+    merged_onchain_summary = merged_onchain_summary.sort_values(by='pct_change', ascending=False)
     
     # Identify projects with drops (transaction count after July is less than before July)
-    merged_summary['dropped'] = merged_summary['transaction_count_after_july'] < merged_summary['transaction_count_before_july']
+    merged_onchain_summary['dropped'] = merged_onchain_summary['transaction_count_after_july'] < merged_onchain_summary['transaction_count_before_july']
     
     # Create the dumbbell plot
     fig = go.Figure()
     
     # Add 1 to avoid log(0) errors (since log scale cannot handle zero values)
-    merged_summary['transaction_count_before_july'] = merged_summary['transaction_count_before_july'] + 1
-    merged_summary['transaction_count_after_july'] = merged_summary['transaction_count_after_july'] + 1
+    merged_onchain_summary['transaction_count_before_july_display'] = merged_onchain_summary['transaction_count_before_july'] + 1
+    merged_onchain_summary['transaction_count_after_july_display'] = merged_onchain_summary['transaction_count_after_july'] + 1
     
     # Add "before July" points
     fig.add_trace(go.Scatter(
-        x=merged_summary['transaction_count_before_july'],
-        y=merged_summary['project_name'],
+        x=merged_onchain_summary['transaction_count_before_july_display'],
+        y=merged_onchain_summary['project_name'],
         mode='markers',
         name='Apr to June 2024',
         marker=dict(color='blue', size=10, opacity=0.7),  # Opacity to maintain distinction
-        hovertext=merged_summary['project_name']
+        hovertext=merged_onchain_summary['project_name']
     ))
     
     # Add "after July" points
     fig.add_trace(go.Scatter(
-        x=merged_summary['transaction_count_after_july'],
-        y=merged_summary['project_name'],
+        x=merged_onchain_summary['transaction_count_after_july_display'],
+        y=merged_onchain_summary['project_name'],
         mode='markers',
         name='From July 1st, 2024',
         marker=dict(color='green', size=10, opacity=0.7),
-        hovertext=merged_summary['project_name']
+        hovertext=merged_onchain_summary['project_name']
     ))
     
     # Add lines connecting the two points, red lines for projects with drops
-    for i in range(len(merged_summary)):
-        line_color = 'red' if merged_summary['dropped'].iloc[i] else 'gray'
+    for i in range(len(merged_onchain_summary)):
+        line_color = 'red' if merged_onchain_summary['dropped'].iloc[i] else 'gray'
         fig.add_shape(type='line',
-                      x0=merged_summary['transaction_count_before_july'].iloc[i],
+                      x0=merged_onchain_summary['transaction_count_before_july_display'].iloc[i],
                       y0=i,
-                      x1=merged_summary['transaction_count_after_july'].iloc[i],
+                      x1=merged_onchain_summary['transaction_count_after_july_display'].iloc[i],
                       y1=i,
                       line=dict(color=line_color, width=2))
     
@@ -389,7 +389,7 @@ with onchain_metrics:
             title='Projects (Sorted by % Change)',
             autorange="reversed"  # Reverse the Y-axis to show descending order
         ),
-        height=len(merged_summary) * 40 + 400,  # Adjust height based on the number of projects
+        height=len(merged_onchain_summary) * 40 + 400,  # Adjust height based on the number of projects
         hovermode='y unified'
     )
     
@@ -400,21 +400,21 @@ with overall_summary:
     summary = pd.read_csv("./data/Info by program.csv")
 
     # Merge summary with metrics_data
-    merged_data = pd.merge(summary, 
+    top_grantee_data = pd.merge(summary, 
                         metrics_data[['Project Key', 'Development Activity Index', 'Last Commit']], 
                         left_on='project_name', 
                         right_on='Project Key', 
                         how='left')
 
     # If you want to drop the redundant 'Project Key' column after merging
-    merged_data = merged_data.drop('Project Key', axis=1)
+    top_grantee_data = top_grantee_data.drop('Project Key', axis=1)
 
     # Rename 'Project Name' to 'OSO Project Name' and fill blank values
-    merged_data = merged_data.rename(columns={'project_name': 'OSO Project Name'})
-    merged_data['OSO Project Name'] = merged_data['OSO Project Name'].fillna('No Data')
+    top_grantee_data = top_grantee_data.rename(columns={'project_name': 'OSO Project Name'})
+    top_grantee_data['OSO Project Name'] = top_grantee_data['OSO Project Name'].fillna('No Data')
 
     # Format Development Activity Index without decimal
-    merged_data['Development Activity Index'] = merged_data['Development Activity Index'].apply(lambda x: f"{x:.0f}" if pd.notnull(x) else pd.NA)
+    top_grantee_data['Development Activity Index'] = top_grantee_data['Development Activity Index'].apply(lambda x: f"{x:.0f}" if pd.notnull(x) else pd.NA)
 
     def days_ago(date_value):
         if pd.isnull(date_value) or date_value == 'No data':
@@ -436,13 +436,32 @@ with overall_summary:
         except ValueError:
             return pd.NA
     
-    merged_data['Days Since Last Commit'] = merged_data['Last Commit'].apply(days_ago).astype('Int64')
-    merged_data = merged_data.drop('Last Commit', axis=1)  # Remove the original 'Last Commit' column
+    top_grantee_data['Days Since Last Commit'] = top_grantee_data['Last Commit'].apply(days_ago).astype('Int64')
+    top_grantee_data = top_grantee_data.drop('Last Commit', axis=1)  # Remove the original 'Last Commit' column
+
+    # Perform the left join with specific columns
+    combined_data = pd.merge(
+        top_grantee_data,
+        merged_onchain_summary[['project_name', 'pct_change', 'transaction_count_after_july', 'transaction_count_before_july']],
+        how='left',
+        left_on='OSO Project Name',
+        right_on='project_name'
+    )
+
+    # Drop the redundant 'project_name' column from merged_onchain_summary
+    combined_data = combined_data.drop(columns=['project_name'], errors='ignore')
+
+    # Rename columns for clarity if needed
+    combined_data = combined_data.rename(columns={
+        'pct_change': 'Transaction Count % Change',
+        'transaction_count_after_july': 'Transactions After July 1st',
+        'transaction_count_before_july': 'Transactions Before July 1st'
+    })
     
     # Display the dataframe
     st.dataframe(
-        merged_data,
+        combined_data,
         use_container_width=True,
         hide_index=True,
-        height = 2000
+        height = 1600
     )
