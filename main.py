@@ -444,5 +444,5 @@ with overall_summary:
         merged_data,
         use_container_width=True,
         hide_index=True,
-        height = 1600
+        height = 2000
     )
