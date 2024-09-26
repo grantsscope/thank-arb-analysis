@@ -493,15 +493,58 @@ with overall_summary:
     
     # Reindex the dataframe with the new column order
     combined_data = combined_data.reindex(columns=column_order)
+
+    # Function to format Development Activity Index
+    def format_dev_activity_index(value):
+        if pd.isna(value):
+            return ''
+        value = float(value)
+        if value < 20:
+            return 'color: red'
+        elif value > 50:
+            return 'color: green'
+        return ''
+    
+    # Function to format Change in Transactions
+    def format_change_in_transactions(value):
+        if value == '🟢':
+            return 'color: green'
+        elif value == '🔴':
+            return 'color: red'
+        return ''
+    
+    # Function to format Days Since Last Commit
+    def format_days_since_last_commit(value):
+        if pd.isna(value):
+            return ''
+        value = float(value)
+        if value > 30:
+            return 'color: red'
+        return ''
+    
+    # Function to apply styling to the entire dataframe
+    def style_dataframe(df):
+        return df.style.applymap(format_dev_activity_index, subset=['Development Activity Index']) \
+                       .applymap(format_change_in_transactions, subset=['Change in Transactions']) \
+                       .applymap(format_days_since_last_commit, subset=['Days Since Last Commit']) \
+                       .format({
+                           'Development Activity Index': '{:.0f}',
+                           'Days Since Last Commit': '{:.0f}',
+                           'Transactions Before July 1st (3 months)': '{:,.0f}',
+                           'Transactions After July 1st': '{:,.0f}'
+                       })
+
     
     # Display the dataframe
     st.dataframe(
-        combined_data,
+        style_dataframe(combined_data),
         use_container_width=True,
         height=1600,
         hide_index=True,
         column_config={
             "Transactions Before July 1st (3 months)": st.column_config.NumberColumn(format="%d"),
-            "Transactions After July 1st": st.column_config.NumberColumn(format="%d")
+            "Transactions After July 1st": st.column_config.NumberColumn(format="%d"),
+            "Development Activity Index": st.column_config.Column(width="medium", help="Development Activity Index: <20 (red), >50 (green)"),
+            "Days Since Last Commit": st.column_config.Column(width="medium",help="Days Since Last Commit: >30 (red)")
         }
     )
