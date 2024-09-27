@@ -395,10 +395,9 @@ with onchain_metrics:
     
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
-    st.markdown("### Testing - DNU yet: Transaction Profile Based on Passport Score")
-
     
     # Distribution of users by Score
+    #st.markdown("### Testing - DNU yet: Transaction Profile Based on Passport Score")
     trans_detail = pd.read_csv("./data/Transaction Detail with Score.csv")
 
     # Function to categorize score based on the rules
