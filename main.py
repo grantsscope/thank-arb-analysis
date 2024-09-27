@@ -427,6 +427,13 @@ with onchain_metrics:
         score_5_to_15=('score_category', lambda x: (x == 'Score 5 to 15').sum()),
         score_greater_than_15=('score_category', lambda x: (x == 'Score greater than 15').sum())
     ).reset_index()
+
+   # Display the original dataframe
+    st.dataframe(
+        trans_detail,
+        use_container_width=True,
+        hide_index=True,
+    )
     
     # Display the original dataframe
     st.dataframe(
