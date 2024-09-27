@@ -461,7 +461,8 @@ with onchain_metrics:
     # Update layout
     fig.update_layout(showlegend=True, barmode='stack', 
                       xaxis_title='Percentage of Total Transactions', 
-                      yaxis_title='Project Name')
+                      yaxis_title='Project Name',
+                      height=max(600, len(trans_result) * 20))
     
     # Show the plot
     st.plotly_chart(fig, use_container_width=True)
