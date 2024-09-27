@@ -471,6 +471,13 @@ with onchain_metrics:
     
     # Display the chart
     st.plotly_chart(fig, use_container_width=True)
+    
+    # Display the original dataframe
+    st.dataframe(
+        trans_result,
+        use_container_width=True,
+        hide_index=True,
+    )
 
 
 with integrated_view:
