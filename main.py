@@ -411,7 +411,7 @@ with onchain_metrics:
             return 'Score missing'
         elif score <= 5:
             return 'Score 0 to 5'
-        elif score <= 15:
+        elif score > 5 and score <= 15:
             return 'Score 5 to 15'
         else:
             return 'Score greater than 15'
