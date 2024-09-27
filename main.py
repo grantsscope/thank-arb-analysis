@@ -419,13 +419,13 @@ with onchain_metrics:
     # Apply the categorization function
     trans_detail['score_category'] = trans_detail.apply(categorize_score, axis=1)
     
-    # Aggregating the results
+    # Adjusting the aggregation logic to sum the transaction_count when the score_category matches
     trans_result = trans_detail.groupby('project_name').agg(
         total_transaction_count=('transaction_count', 'sum'),
-        score_missing=('score_category', lambda x: (x == 'Score missing').sum()),
-        score_0_to_5=('score_category', lambda x: (x == 'Score 0 to 5').sum()),
-        score_5_to_15=('score_category', lambda x: (x == 'Score 5 to 15').sum()),
-        score_greater_than_15=('score_category', lambda x: (x == 'Score greater than 15').sum())
+        score_missing=('transaction_count', lambda x: x[trans_detail['score_category'] == 'Score missing'].sum()),
+        score_0_to_5=('transaction_count', lambda x: x[trans_detail['score_category'] == 'Score 0 to 5'].sum()),
+        score_5_to_15=('transaction_count', lambda x: x[trans_detail['score_category'] == 'Score 5 to 15'].sum()),
+        score_greater_than_15=('transaction_count', lambda x: x[trans_detail['score_category'] == 'Score greater than 15'].sum())
     ).reset_index()
 
    # Display the original dataframe
