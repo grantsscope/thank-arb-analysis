@@ -464,7 +464,7 @@ with onchain_metrics:
                       yaxis_title='Project Name')
     
     # Show the plot
-    fig.show()
+    st.plotly_chart(fig, use_container_width=True)
     
     # Display the original dataframe
     st.dataframe(
