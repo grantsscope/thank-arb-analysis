@@ -427,50 +427,6 @@ with onchain_metrics:
         score_5_to_15=('score_category', lambda x: (x == 'Score 5 to 15').sum()),
         score_greater_than_15=('score_category', lambda x: (x == 'Score greater than 15').sum())
     ).reset_index()
-
-    # Calculate percentages
-    score_categories = ['score_missing', 'score_0_to_5', 'score_5_to_15', 'score_greater_than_15']
-    trans_result_pct = trans_result[score_categories].div(trans_result[score_categories].sum(axis=1), axis=0) * 100
-    
-    # Sort by percentage of 'score_greater_than_15'
-    trans_result_sorted = trans_result_pct.sort_values('score_greater_than_15', ascending=True)
-    
-    # Define colors and labels for each category
-    colors = ['gray', 'red', 'yellow', 'green']
-    labels = ['Score Missing', 'Score 0 to 5', 'Score 5 to 15', 'Score > 15']
-    
-    # Create the stacked bar chart
-    fig = go.Figure()
-    
-    for category, color, label in zip(score_categories, colors, labels):
-        fig.add_trace(go.Bar(
-            y=trans_result_sorted['project_name'],
-            x=trans_result_sorted[category],
-            name=label,
-            orientation='h',
-            marker=dict(color=color),
-            hovertemplate='%{y}<br>' + label + ': %{x:.1f}%<extra></extra>'
-        ))
-    
-    # Update layout
-    fig.update_layout(
-        title='Project Score Categories (Percentage)',
-        barmode='stack',
-        yaxis_title='Project Name',
-        xaxis_title='Percentage',
-        legend_title='Score Categories',
-        height=max(600, len(trans_result) * 20),  # Adjust height based on number of projects
-        xaxis=dict(tickformat=',.0%', range=[0, 100]),
-        hovermode='closest'
-    )
-    
-    # Add percentage labels on the bars
-    for i in range(len(fig.data)):
-        fig.data[i].text = trans_result_sorted[score_categories[i]].apply(lambda x: f'{x:.1f}%' if x > 5 else '')
-        fig.data[i].textposition = 'inside'
-    
-    # Display the chart
-    st.plotly_chart(fig, use_container_width=True)
     
     # Display the original dataframe
     st.dataframe(
