@@ -395,6 +395,45 @@ with onchain_metrics:
     
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
+    st.markdown("### Testing - DNU yet: Transaction Profile Based on Passport Score")
+
+    # Distribution of users by Score
+    trans_detail = pd.read_csv("./data/Transaction Detail with Score.csv")
+
+    # Function to categorize score based on the rules
+    def categorize_score(row):
+        if row['from_address'] == row['artifact_name']:
+            score = row['to_address_rawscore']
+        else:
+            score = row['from_address_rawscore']
+            
+        if pd.isnull(score):
+            return 'Score missing'
+        elif score <= 5:
+            return 'Score 0 to 5'
+        elif score <= 15:
+            return 'Score 5 to 15'
+        else:
+            return 'Score greater than 15'
+    
+    # Apply the categorization function
+    trans_detail['score_category'] = trans_detail.apply(categorize_score, axis=1)
+    
+    # Aggregating the results
+    trans_result = trans_detail.groupby('project_name').agg(
+        total_transaction_count=('transaction_count', 'sum'),
+        score_missing=('score_category', lambda x: (x == 'Score missing').sum()),
+        score_0_to_5=('score_category', lambda x: (x == 'Score 0 to 5').sum()),
+        score_5_to_15=('score_category', lambda x: (x == 'Score 5 to 15').sum()),
+        score_greater_than_15=('score_category', lambda x: (x == 'Score greater than 15').sum())
+    ).reset_index()
+
+    st.dataframe(
+        trans_result,
+        use_container_width=True,
+        hide_index=True,
+    )
+
 
 with integrated_view:
 
