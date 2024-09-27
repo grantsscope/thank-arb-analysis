@@ -428,12 +428,43 @@ with onchain_metrics:
         score_greater_than_15=('transaction_count', lambda x: x[trans_detail['score_category'] == 'Score greater than 15'].sum())
     ).reset_index()
 
-   # Display the original dataframe
-    st.dataframe(
-        trans_detail,
-        use_container_width=True,
-        hide_index=True,
+    # Calculate percentage split for each score category
+    trans_result['score_missing_%'] = (trans_result['score_missing'] / trans_result['total_transaction_count']) * 100
+    trans_result['score_0_to_5_%'] = (trans_result['score_0_to_5'] / trans_result['total_transaction_count']) * 100
+    trans_result['score_5_to_15_%'] = (trans_result['score_5_to_15'] / trans_result['total_transaction_count']) * 100
+    trans_result['score_greater_than_15_%'] = (trans_result['score_greater_than_15'] / trans_result['total_transaction_count']) * 100
+    
+    # Melt the dataframe to a long format suitable for a stacked bar chart
+    trans_melted = trans_result.melt(
+        id_vars=['project_name', 'total_transaction_count'],
+        value_vars=['score_missing_%', 'score_0_to_5_%', 'score_5_to_15_%', 'score_greater_than_15_%'],
+        var_name='score_category',
+        value_name='percentage'
     )
+    
+    # Create a horizontal stacked bar chart with Plotly
+    fig = px.bar(trans_melted, 
+                 x='percentage', 
+                 y='project_name', 
+                 color='score_category',
+                 text='percentage',
+                 title='Percentage Split of Scores by Project',
+                 orientation='h')
+    
+    # Add total transaction count as annotations
+    for i, row in trans_result.iterrows():
+        fig.add_annotation(x=100, y=i, 
+                           text=f"Total: {row['total_transaction_count']}", 
+                           showarrow=False, 
+                           yshift=10)
+    
+    # Update layout
+    fig.update_layout(showlegend=True, barmode='stack', 
+                      xaxis_title='Percentage of Total Transactions', 
+                      yaxis_title='Project Name')
+    
+    # Show the plot
+    fig.show()
     
     # Display the original dataframe
     st.dataframe(
