@@ -397,6 +397,7 @@ with onchain_metrics:
     st.plotly_chart(fig, use_container_width=True)
     st.markdown("### Testing - DNU yet: Transaction Profile Based on Passport Score")
 
+    """
     # Distribution of users by Score
     trans_detail = pd.read_csv("./data/Transaction Detail with Score.csv")
 
@@ -473,7 +474,7 @@ with onchain_metrics:
         use_container_width=True,
         hide_index=True,
     )
-
+"""
 
 with integrated_view:
 
