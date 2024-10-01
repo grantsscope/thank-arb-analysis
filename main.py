@@ -312,7 +312,7 @@ with onchain_metrics:
     
     # Group by 'month' and 'project_name', and calculate the required aggregations
     onchain_data = onchain_data_detail.groupby(['month', 'project_name']).agg(
-        transaction_count=('transaction_hash', 'count'),
+        transaction_count=('transaction_hash', 'nunique'),
         distinct_to_addresses=('to_address', 'nunique'),
         distinct_from_addresses=('from_address', 'nunique')
     ).reset_index()
