@@ -301,7 +301,24 @@ with code_metrics:
     st.plotly_chart(fig, use_container_width=True)
 
 with onchain_metrics:
-    onchain_data = pd.read_csv("./data/monthly transactions by projects.csv")
+#    onchain_data = pd.read_csv("./data/monthly transactions by projects.csv")
+    onchain_data_detail = pd.read_csv("./data/transact.csv")
+    
+    # Convert block_timestamp to datetime
+    onchain_data_detail['block_timestamp'] = pd.to_datetime(onchain_data_detail['block_timestamp'])
+    
+    # Extract year-month from block_timestamp for aggregation
+    onchain_data_detail['month'] = onchain_data_detail['block_timestamp'].dt.to_period('M')
+    
+    # Group by 'month' and 'project_name', and calculate the required aggregations
+    onchain_data = onchain_data_detail.groupby(['month', 'project_name']).agg(
+        transaction_count=('transaction_hash', 'transaction_count'),
+        distinct_to_addresses=('to_address', 'distinct_to_addresses'),
+        distinct_from_addresses=('from_address', 'distinct_from_addresses')
+    ).reset_index()
+    
+    # Convert 'month' back to string format for final output
+    #aggregated_df['month'] = aggregated_df['month'].astype(str)
 
     st.markdown("""
     ### Which projects have gained most momentum in # of onchain transactions since July 1st, 2024?
