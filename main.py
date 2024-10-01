@@ -557,13 +557,20 @@ with overall_summary:
                         metrics_data[['Project Key', 'Development Activity Index', 'Last Commit']], 
                         left_on='project_name', 
                         right_on='Project Key', 
-                        how='left')
+                        how='outer')
 
     # If you want to drop the redundant 'Project Key' column after merging
-    top_grantee_data = top_grantee_data.drop('Project Key', axis=1)
+    # top_grantee_data = top_grantee_data.drop('Project Key', axis=1)
 
     # Rename 'Project Name' to 'OSO Project Name' and fill blank values
-    top_grantee_data = top_grantee_data.rename(columns={'project_name': 'OSO Project Name'})
+    #top_grantee_data = top_grantee_data.rename(columns={'project_name': 'OSO Project Name'})
+    
+    # Create the new 'OSO Project Name' column
+    top_grantee_data['OSO Project Name'] = top_grantee_data['Project Key']
+    
+    # Drop the redundant 'Project Key' column after merging
+    top_grantee_data = top_grantee_data.drop('Project Key', axis=1)
+
     top_grantee_data['OSO Project Name'] = top_grantee_data['OSO Project Name'].fillna('No Data')
 
     # Format Development Activity Index without decimal
