@@ -413,83 +413,34 @@ with onchain_metrics:
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
     
-    # Distribution of users by Score
-    #st.markdown("### Testing - DNU yet: Transaction Profile Based on Passport Score")
-    trans_detail = pd.read_csv("./data/Transaction Detail with Score.csv")
+    # Show categorization by Passport Score
 
-    # Function to categorize score based on the rules
-    def categorize_score(row):
-        if row['from_address'] == row['artifact_name']:
-            score = row['to_address_rawscore']
-        else:
-            score = row['from_address_rawscore']
-            
-        if pd.isnull(score):
-            return 'Score missing'
+    st.markdown("### Transaction Count by Passport Score")
+    # Categorize the 'passport_score' into the desired groups
+    def categorize_passport_score(score):
+        if pd.isna(score):
+            return 'missing'
         elif score <= 5:
-            return 'Score 0 to 5'
-        elif score > 5 and score <= 15:
-            return 'Score 5 to 15'
+            return '0 to 5'
+        elif score <= 15:
+            return '5 to 15'
         else:
-            return 'Score greater than 15'
+            return '15+'
     
-    # Apply the categorization function
-    trans_detail['score_category'] = trans_detail.apply(categorize_score, axis=1)
+    # Apply the categorization function to the 'passport_score' column
+    onchain_data_detail['passport_category'] = onchain_data_detail['passport_score'].apply(categorize_passport_score)
     
-    # Adjusting the aggregation logic to sum the transaction_count when the score_category matches
-    trans_result = trans_detail.groupby('project_name').agg(
-        total_transaction_count=('transaction_count', 'sum'),
-        score_missing=('transaction_count', lambda x: x[trans_detail['score_category'] == 'Score missing'].sum()),
-        score_0_to_5=('transaction_count', lambda x: x[trans_detail['score_category'] == 'Score 0 to 5'].sum()),
-        score_5_to_15=('transaction_count', lambda x: x[trans_detail['score_category'] == 'Score 5 to 15'].sum()),
-        score_greater_than_15=('transaction_count', lambda x: x[trans_detail['score_category'] == 'Score greater than 15'].sum())
+    # Group by 'project_name' and 'passport_category', and count unique 'transaction_hash'
+    aggregated_df = onchain_data_detail.groupby(['project_name', 'passport_category']).agg(
+        unique_transaction_count=('transaction_hash', 'nunique')
     ).reset_index()
 
-    # Calculate percentage split for each score category
-    trans_result['score_missing_%'] = (trans_result['score_missing'] / trans_result['total_transaction_count']) * 100
-    trans_result['score_0_to_5_%'] = (trans_result['score_0_to_5'] / trans_result['total_transaction_count']) * 100
-    trans_result['score_5_to_15_%'] = (trans_result['score_5_to_15'] / trans_result['total_transaction_count']) * 100
-    trans_result['score_greater_than_15_%'] = (trans_result['score_greater_than_15'] / trans_result['total_transaction_count']) * 100
-    
-    # Melt the dataframe to a long format suitable for a stacked bar chart
-    trans_melted = trans_result.melt(
-        id_vars=['project_name', 'total_transaction_count'],
-        value_vars=['score_missing_%', 'score_0_to_5_%', 'score_5_to_15_%', 'score_greater_than_15_%'],
-        var_name='score_category',
-        value_name='percentage'
-    )
-    
-    # Create a horizontal stacked bar chart with Plotly
-    fig = px.bar(trans_melted, 
-                 x='percentage', 
-                 y='project_name', 
-                 color='score_category',
-                 text='percentage',
-                 title='Percentage Split of Scores by Project',
-                 orientation='h')
-    
-    # Add total transaction count as annotations
-    for i, row in trans_result.iterrows():
-        fig.add_annotation(x=100, y=i, 
-                           text=f"Total: {row['total_transaction_count']}", 
-                           showarrow=False, 
-                           yshift=10)
-    
-    # Update layout
-    fig.update_layout(showlegend=True, barmode='stack', 
-                      xaxis_title='Percentage of Total Transactions', 
-                      yaxis_title='Project Name',
-                      height=max(600, len(trans_result) * 20))
-    
-    # Show the plot
-    # st.plotly_chart(fig, use_container_width=True)
-    
-    # Display the original dataframe
-    #st.dataframe(
-    #    trans_result,
-    #    use_container_width=True,
-    #    hide_index=True,
-    #)
+    st.dataframe(
+            aggregated_df,
+            use_container_width=True,
+            height=1600,
+            hide_index=True
+        )
 
 
 with integrated_view:
