@@ -708,7 +708,8 @@ with overall_summary:
                            'Transactions After July 1st': '{:,.0f}'
                        }, na_rep="")
 
-    
+
+    st.caption("<sup>*</sup> Grantee and Program columns are populated for projects identified as top grantees in the program")
     # Display the dataframe
     st.dataframe(
         style_dataframe(combined_data),
@@ -716,6 +717,8 @@ with overall_summary:
         height=1600,
         hide_index=True,
         column_config={
+            "Grantee": st.column_config.TextColumn(label="Grantee<sup>*</sup>"),
+            "Program": st.column_config.TextColumn(label="Program<sup>*</sup>"),
             "Transactions Before July 1st (3 months)": st.column_config.NumberColumn(format="%d"),
             "Transactions After July 1st": st.column_config.NumberColumn(format="%d"),
             "Development Activity Index": st.column_config.Column(width="medium", help="Development Activity Index: <20 (red), >50 (green)"),
