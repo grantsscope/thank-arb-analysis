@@ -311,12 +311,12 @@ with onchain_metrics:
     onchain_data_detail['month'] = onchain_data_detail['block_timestamp'].dt.to_period('M')
     
     # Group by 'month' and 'project_name', and calculate the required aggregations
-    onchain_data = onchain_data_detail.groupby(['month', 'project_name']).agg(
-        transaction_count=('transaction_hash', 'transaction_count'),
-        distinct_to_addresses=('to_address', 'distinct_to_addresses'),
-        distinct_from_addresses=('from_address', 'distinct_from_addresses')
+    onchain_data = df.groupby(['month', 'project_name']).agg(
+        transaction_count=('transaction_hash', 'count'),
+        distinct_to_addresses=('to_address', 'nunique'),
+        distinct_from_addresses=('from_address', 'nunique')
     ).reset_index()
-    
+        
     # Convert 'month' back to string format for final output
     #aggregated_df['month'] = aggregated_df['month'].astype(str)
 
