@@ -709,7 +709,7 @@ with overall_summary:
                        }, na_rep="")
 
 
-    st.caption("* Note: Grantee and Program columns are populated for projects identified as top grantees in the program")
+    st.caption("\* Note: Grantee and Program columns are populated for projects identified as top grantees in the program")
     # Display the dataframe
     st.dataframe(
         style_dataframe(combined_data),
