@@ -435,12 +435,12 @@ with onchain_metrics:
         unique_transaction_count=('transaction_hash', 'nunique')
     ).reset_index()
 
-    st.dataframe(
-            aggregated_df,
-            use_container_width=True,
-            height=1600,
-            hide_index=True
-        )
+    #st.dataframe(
+    #        aggregated_df,
+    #        use_container_width=True,
+    #        height=1600,
+    #        hide_index=True
+    #    )
 
 
 with integrated_view:
