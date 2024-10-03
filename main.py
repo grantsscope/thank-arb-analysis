@@ -489,7 +489,7 @@ with onchain_metrics:
     # Show the plot
     st.markdown("This chart shows the percentage of transactions for each project categorized by users' passport scores. Projects are sorted by the percentage of high scores ('15+') first, followed by mid-range scores ('5 to 15'), lower scores ('0 to 5'), and missing data.")
     st.caption("Hover over the chart to see the count of transactions")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig)
 
     
 
