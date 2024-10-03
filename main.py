@@ -436,10 +436,17 @@ with onchain_metrics:
 
     # Define the order of categories and colors
     category_order = ['missing', '0 to 5', '5 to 15', '15+']
-    colors = {'missing': 'grey', '0 to 5': 'lightcoral', '5 to 15': 'lightblue', '15+': 'lightgreen'}
+    colors = {'missing': 'lightgrey', '0 to 5': 'lightcoral', '5 to 15': 'lightblue', '15+': 'lightgreen'}
+
+    # Calculate total transactions for each project
+    total_transactions = onchain_data_detail.groupby(['project_name', 'passport_category']).size().unstack(fill_value=0)
+    category_distribution_percentage_long['total_transactions'] = category_distribution_percentage_long.apply(
+        lambda row: total_transactions.loc[row['project_name'], row['passport_category']], axis=1
+    )
     
-    # Reshape the data for plotly, so it is in a long format
-    category_distribution_percentage_long = category_distribution_percentage.reset_index().melt(id_vars='project_name', var_name='passport_category', value_name='percentage')
+    # Define the order of categories and colors
+    category_order = ['missing', '0 to 5', '5 to 15', '15+']
+    colors = {'missing': 'grey', '0 to 5': 'lightcoral', '5 to 15': 'lightblue', '15+': 'lightgreen'}
     
     # Create the horizontal bar chart using Plotly with specified order and colors
     fig = px.bar(category_distribution_percentage_long, 
@@ -451,10 +458,12 @@ with onchain_metrics:
                  orientation='h',
                  title='Distribution of Transactions by Passport Category for Each Project (in %)',
                  labels={'percentage': 'Percentage', 'project_name': 'Project Name'},
-                 height=400 + len(category_distribution_percentage_long['project_name'].unique()) * 50)
+                 height=400 + len(category_distribution_percentage_long['project_name'].unique()) * 50,
+                 custom_data=['total_transactions'])
     
     # Update the layout to include the total number of transactions in the hover data
-    fig.update_traces(hovertemplate='<b>%{y}</b><br>Category: %{color}<br>Percentage: %{x:.2f}%<br>Total transactions: %{customdata}')
+    fig.update_traces(hovertemplate='<b>%{y}</b><br>Category: %{color}<br>Percentage: %{x:.2f}%<br>Total transactions: %{customdata[0]}')
+
     
     # Show the plot
     st.plotly_chart(fig, use_container_width=True)
