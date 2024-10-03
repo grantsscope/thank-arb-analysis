@@ -461,7 +461,7 @@ with onchain_metrics:
     # Sort by 15+ first, then 5 to 15, then 0 to 5, and finally missing
     category_distribution_percentage_long = category_distribution_percentage_long.sort_values(
         by=['15_plus_percentage', '5_to_15_percentage', '0_to_5_percentage', 'missing_percentage'],
-        ascending=[False, False, False, False])
+        ascending=[True, True, True, True])
     
     # Define the order of categories and colors
     category_order = ['missing', '0 to 5', '5 to 15', '15+']
