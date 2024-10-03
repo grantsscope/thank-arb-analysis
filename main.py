@@ -438,10 +438,10 @@ with onchain_metrics:
     colors = {'missing': 'lightgrey', '0 to 5': 'lightcoral', '5 to 15': 'lightblue', '15+': 'lightgreen'}
 
     # Calculate total transactions for each project
-    total_transactions = onchain_data_detail.groupby(['project_name', 'passport_category']).size().unstack(fill_value=0)
+    # total_transactions = onchain_data_detail.groupby(['project_name', 'passport_category']).size().unstack(fill_value=0)
     category_distribution_percentage_long = category_distribution_percentage.reset_index().melt(id_vars='project_name', var_name='passport_category', value_name='percentage')
     category_distribution_percentage_long['total_transactions'] = category_distribution_percentage_long.apply(
-        lambda row: total_transactions.loc[row['project_name'], row['passport_category']], axis=1
+        lambda row: category_distribution.loc[row['project_name'], row['passport_category']], axis=1
     )
     
     # Add the sort values for each category
@@ -468,7 +468,7 @@ with onchain_metrics:
     
     # Concatenate project names with total transactions
     category_distribution_percentage_long['project_name_with_transactions'] = category_distribution_percentage_long.apply(
-        lambda row: f"{row['project_name']} (Total: {total_transactions.loc[row['project_name']].sum()})", axis=1)
+        lambda row: f"{row['project_name']} (Total: {category_distribution.loc[row['project_name']].sum()})", axis=1)
     
     # Create the horizontal bar chart using Plotly with specified order and colors
     fig = px.bar(category_distribution_percentage_long, 
