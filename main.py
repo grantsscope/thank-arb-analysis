@@ -444,10 +444,17 @@ with onchain_metrics:
     category_distribution_percentage_long['total_transactions'] = category_distribution_percentage_long.apply(
         lambda row: total_transactions.loc[row['project_name'], row['passport_category']], axis=1
     )
+
+    # Sort projects by '15+' category percentage and then '5 to 15' category percentage
+    category_distribution_percentage_long['sort_value'] = category_distribution_percentage_long.apply(
+        lambda row: category_distribution_percentage.loc[row['project_name'], '15+'], axis=1)
+    
+    category_distribution_percentage_long = category_distribution_percentage_long.sort_values(by=['sort_value', 'project_name'], ascending=[False, True])
+
     
     # Define the order of categories and colors
     category_order = ['missing', '0 to 5', '5 to 15', '15+']
-    colors = {'missing': 'grey', '0 to 5': 'lightcoral', '5 to 15': 'lightblue', '15+': 'lightgreen'}
+    colors = {'missing': 'lightgrey', '0 to 5': 'lightcoral', '5 to 15': 'lightblue', '15+': 'lightgreen'}
     
     # Create the horizontal bar chart using Plotly with specified order and colors
     fig = px.bar(category_distribution_percentage_long, 
