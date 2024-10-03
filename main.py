@@ -444,13 +444,24 @@ with onchain_metrics:
     category_distribution_percentage_long['total_transactions'] = category_distribution_percentage_long.apply(
         lambda row: total_transactions.loc[row['project_name'], row['passport_category']], axis=1
     )
-
-    # Sort projects by '15+' category percentage and then '5 to 15' category percentage
-    category_distribution_percentage_long['sort_value'] = category_distribution_percentage_long.apply(
+    
+    # Add the sort values for each category
+    category_distribution_percentage_long['15_plus_percentage'] = category_distribution_percentage_long.apply(
         lambda row: category_distribution_percentage.loc[row['project_name'], '15+'], axis=1)
     
-    category_distribution_percentage_long = category_distribution_percentage_long.sort_values(by=['sort_value', 'project_name'], ascending=[False, True])
-
+    category_distribution_percentage_long['5_to_15_percentage'] = category_distribution_percentage_long.apply(
+        lambda row: category_distribution_percentage.loc[row['project_name'], '5 to 15'], axis=1)
+    
+    category_distribution_percentage_long['0_to_5_percentage'] = category_distribution_percentage_long.apply(
+        lambda row: category_distribution_percentage.loc[row['project_name'], '0 to 5'], axis=1)
+    
+    category_distribution_percentage_long['missing_percentage'] = category_distribution_percentage_long.apply(
+        lambda row: category_distribution_percentage.loc[row['project_name'], 'missing'], axis=1)
+    
+    # Sort by 15+ first, then 5 to 15, then 0 to 5, and finally missing
+    category_distribution_percentage_long = category_distribution_percentage_long.sort_values(
+        by=['15_plus_percentage', '5_to_15_percentage', '0_to_5_percentage', 'missing_percentage'],
+        ascending=[False, False, False, False])
     
     # Define the order of categories and colors
     category_order = ['missing', '0 to 5', '5 to 15', '15+']
