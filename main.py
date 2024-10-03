@@ -467,15 +467,19 @@ with onchain_metrics:
     category_order = ['missing', '0 to 5', '5 to 15', '15+']
     colors = {'missing': 'lightgrey', '0 to 5': 'lightcoral', '5 to 15': 'lightblue', '15+': 'lightgreen'}
     
+    # Concatenate project names with total transactions
+    category_distribution_percentage_long['project_name_with_transactions'] = category_distribution_percentage_long.apply(
+        lambda row: f"{row['project_name']} (Total: {total_transactions.loc[row['project_name']].sum()})", axis=1)
+    
     # Create the horizontal bar chart using Plotly with specified order and colors
     fig = px.bar(category_distribution_percentage_long, 
                  x='percentage', 
-                 y='project_name', 
+                 y='project_name_with_transactions',  # Updated y-axis to include total transactions
                  color='passport_category', 
                  color_discrete_map=colors,
                  category_orders={'passport_category': category_order},
                  orientation='h',
-                 labels={'percentage': 'Percentage', 'project_name': 'Project Name'},
+                 labels={'percentage': 'Percentage', 'project_name_with_transactions': 'Project Name'},
                  height=400 + len(category_distribution_percentage_long['project_name'].unique()) * 20,
                  custom_data=['total_transactions', 'passport_category'])
     
