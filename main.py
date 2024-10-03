@@ -435,12 +435,68 @@ with onchain_metrics:
         unique_transaction_count=('transaction_hash', 'nunique')
     ).reset_index()
 
-    st.dataframe(
-            aggregated_df,
-            use_container_width=True,
-            height=1600,
-            hide_index=True
-        )
+    # Calculate total transactions for each project
+    aggregated_df['total_transactions'] = (
+        aggregated_df['score_missing'] +
+        aggregated_df['score_0_to_5'] +
+        aggregated_df['score_5_to_15'] +
+        aggregated_df['score_greater_than_15']
+    )
+    
+    # Calculate percentage shares
+    aggregated_df['percent_missing'] = (aggregated_df['score_missing'] / aggregated_df['total_transactions']) * 100
+    aggregated_df['percent_0_to_5'] = (aggregated_df['score_0_to_5'] / aggregated_df['total_transactions']) * 100
+    aggregated_df['percent_5_to_15'] = (aggregated_df['score_5_to_15'] / aggregated_df['total_transactions']) * 100
+    aggregated_df['percent_greater_than_15'] = (aggregated_df['score_greater_than_15'] / aggregated_df['total_transactions']) * 100
+    
+    # Create the stacked bar chart
+    fig = go.Figure()
+    
+    # Add traces for each category
+    fig.add_trace(go.Bar(
+        y=aggregated_df['project_name'],
+        x=aggregated_df['percent_missing'],
+        name='Score Missing',
+        orientation='h',
+        marker=dict(color='gray'),
+    ))
+    
+    fig.add_trace(go.Bar(
+        y=aggregated_df['project_name'],
+        x=aggregated_df['percent_0_to_5'],
+        name='Score 0 to 5',
+        orientation='h',
+        marker=dict(color='red'),
+    ))
+    
+    fig.add_trace(go.Bar(
+        y=aggregated_df['project_name'],
+        x=aggregated_df['percent_5_to_15'],
+        name='Score 5 to 15',
+        orientation='h',
+        marker=dict(color='yellow'),
+    ))
+    
+    fig.add_trace(go.Bar(
+        y=aggregated_df['project_name'],
+        x=aggregated_df['percent_greater_than_15'],
+        name='Score > 15',
+        orientation='h',
+        marker=dict(color='green'),
+    ))
+    
+    # Update layout
+    fig.update_layout(
+        title='Share of Transactions by Passport Score',
+        barmode='stack',
+        yaxis_title='Project Name',
+        xaxis_title='Percentage (%)',
+        xaxis=dict(tickformat=',.0%', range=[0, 100]),
+        height=max(600, len(aggregated_df) * 25),  # Adjust height based on number of projects
+    )
+    
+    # Display the chart in Streamlit
+    st.plotly_chart(fig, use_container_width=True)
 
 
 with integrated_view:
