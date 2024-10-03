@@ -430,27 +430,19 @@ with onchain_metrics:
     # Apply the categorization function to the 'passport_score' column
     onchain_data_detail['passport_category'] = onchain_data_detail['passport_score'].apply(categorize_passport_score)
     
-    # Group by 'project_name' and 'passport_category', and count unique 'transaction_hash'
-    aggregated_df = onchain_data_detail.groupby(['project_name', 'passport_category']).agg(
-        unique_transaction_count=('transaction_hash', 'nunique')
-    ).reset_index()
+    category_counts = onchain_data_detail.groupby(['project_name', 'passport_category']).size().reset_index(name='count')
 
-    # Group by project_name and passport_category, then count occurrences
-    category_counts = aggregated_df.groupby(['project_name', 'passport_category']).size().reset_index(name='count')
-    
-    # Pivot the DataFrame to get categories as columns
     pivot_df = category_counts.pivot(index='project_name', columns='passport_category', values='count').fillna(0)
-    
-    # Calculate total transactions for each project
+
     pivot_df['total_transactions'] = pivot_df.sum(axis=1)
-    
+
     # Calculate percentage shares
     for category in pivot_df.columns[:-1]:  # Exclude 'total_transactions'
         pivot_df[f'percent_{category}'] = (pivot_df[category] / pivot_df['total_transactions']) * 100
-    
+
     # Create the stacked bar chart
     fig = go.Figure()
-    
+
     # Add traces for each category
     for category in pivot_df.columns[:-1]:  # Exclude 'total_transactions'
         fig.add_trace(go.Bar(
@@ -460,7 +452,7 @@ with onchain_metrics:
             orientation='h',
             marker=dict(color='gray' if category == 'missing' else 'red' if category == '0 to 5' else 'yellow' if category == '5 to 15' else 'green'),
         ))
-    
+
     # Update layout
     fig.update_layout(
         title='Share of Transactions by Passport Score Category',
@@ -470,9 +462,10 @@ with onchain_metrics:
         xaxis=dict(tickformat=',.0%', range=[0, 100]),
         height=max(600, len(pivot_df) * 25),  # Adjust height based on number of projects
     )
-    
-    # Display the chart in Streamlit
+
     st.plotly_chart(fig, use_container_width=True)
+
+    
 
 with integrated_view:
 
