@@ -440,6 +440,7 @@ with onchain_metrics:
 
     # Calculate total transactions for each project
     total_transactions = onchain_data_detail.groupby(['project_name', 'passport_category']).size().unstack(fill_value=0)
+    category_distribution_percentage_long = category_distribution_percentage.reset_index().melt(id_vars='project_name', var_name='passport_category', value_name='percentage')
     category_distribution_percentage_long['total_transactions'] = category_distribution_percentage_long.apply(
         lambda row: total_transactions.loc[row['project_name'], row['passport_category']], axis=1
     )
