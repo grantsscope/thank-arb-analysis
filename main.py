@@ -443,7 +443,7 @@ with onchain_metrics:
     category_distribution_percentage_long['total_transactions'] = category_distribution_percentage_long.apply(
         lambda row: category_distribution.loc[row['project_name'], row['passport_category']], axis=1
     )
-    """
+    
     # Add the sort values for each category
     category_distribution_percentage_long['15_plus_percentage'] = category_distribution_percentage_long.apply(
         lambda row: category_distribution_percentage.loc[row['project_name'], '15+'], axis=1)
@@ -456,11 +456,11 @@ with onchain_metrics:
     
     category_distribution_percentage_long['missing_percentage'] = category_distribution_percentage_long.apply(
         lambda row: category_distribution_percentage.loc[row['project_name'], 'missing'], axis=1)
-    """
+    
     
     # Sort by 15+ first, then 5 to 15, then 0 to 5, and finally missing
     category_distribution_percentage_long = category_distribution_percentage_long.sort_values(
-        by=['15+', '5 to 15', '0 to 5', 'missing'],
+        by=['15_plus_percentage', '5_to_15_percentage', '0_to_5_percentage', 'missing_percentage'],
         ascending=[True, True, True, True])
     
     # Define the order of categories and colors
