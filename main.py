@@ -429,41 +429,28 @@ with onchain_metrics:
     
     # Apply the categorization function to the 'passport_score' column
     onchain_data_detail['passport_category'] = onchain_data_detail['passport_score'].apply(categorize_passport_score)
+
+    # Calculate the percentage distribution of transactions by category for each project
+    category_distribution = onchain_data_detail.groupby(['project_name', 'passport_category']).size().unstack(fill_value=0)
+    category_distribution_percentage = category_distribution.div(category_distribution.sum(axis=1), axis=0) * 100
+
+    # Reshape the data for plotly, so it is in a long format
+    category_distribution_percentage_long = category_distribution_percentage.reset_index().melt(id_vars='project_name', var_name='passport_category', value_name='percentage')
     
-    category_counts = onchain_data_detail.groupby(['project_name', 'passport_category']).size().reset_index(name='count')
+    # Create the horizontal bar chart using Plotly
+    fig = px.bar(category_distribution_percentage_long, 
+                 x='percentage', 
+                 y='project_name', 
+                 color='passport_category', 
+                 orientation='h',
+                 title='Distribution of Transactions by Passport Category for Each Project (in %)',
+                 labels={'percentage': 'Percentage', 'project_name': 'Project Name'})
+    
+    # Show the plot
+    fig.show()
 
-    pivot_df = category_counts.pivot(index='project_name', columns='passport_category', values='count').fillna(0)
-
-    pivot_df['total_transactions'] = pivot_df.sum(axis=1)
-
-    # Calculate percentage shares
-    for category in pivot_df.columns[:-1]:  # Exclude 'total_transactions'
-        pivot_df[f'percent_{category}'] = (pivot_df[category] / pivot_df['total_transactions']) * 100
-
-    # Create the stacked bar chart
-    fig = go.Figure()
-
-    # Add traces for each category
-    for category in pivot_df.columns[:-1]:  # Exclude 'total_transactions'
-        fig.add_trace(go.Bar(
-            y=pivot_df.index,
-            x=pivot_df[f'percent_{category}'],
-            name=category,
-            orientation='h',
-            marker=dict(color='gray' if category == 'missing' else 'red' if category == '0 to 5' else 'yellow' if category == '5 to 15' else 'green'),
-        ))
-
-    # Update layout
-    fig.update_layout(
-        title='Share of Transactions by Passport Score Category',
-        barmode='stack',
-        yaxis_title='Project Name',
-        xaxis_title='Percentage (%)',
-        xaxis=dict(tickformat=',.0%', range=[0, 100]),
-        height=max(600, len(pivot_df) * 25),  # Adjust height based on number of projects
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
+    
+    
 
     
 
