@@ -447,7 +447,7 @@ with onchain_metrics:
                  labels={'percentage': 'Percentage', 'project_name': 'Project Name'})
     
     # Show the plot
-    fig.show()
+    st.plotly_chart(fig, use_container_width=True)
 
     
     
