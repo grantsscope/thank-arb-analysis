@@ -416,7 +416,6 @@ with onchain_metrics:
     # Show categorization by Passport Score
 
     st.markdown("### Distribution of Transactions by Passport Score")
-    # Categorize the 'passport_score' into the desired groups
     def categorize_passport_score(score):
         if pd.isna(score):
             return 'missing'
@@ -450,12 +449,9 @@ with onchain_metrics:
     category_distribution_percentage_long = category_distribution_percentage.reset_index().melt(
         id_vars='project_name', var_name='passport_category', value_name='percentage')
     
-    # Add the total transactions column back to the long format data for hover info
-    category_distribution_percentage_long['total_transactions'] = category_distribution_percentage_long['project_name'].map(sorted_category_distribution['total_transactions'])
-    
-    # Concatenate project names with total transactions for display on the y-axis
+    # Concatenate project names with total transactions for display on the y-axis (only for internal use, not displayed)
     category_distribution_percentage_long['project_name_with_transactions'] = category_distribution_percentage_long.apply(
-        lambda row: f"{row['project_name']} (Total: {row['total_transactions']})", axis=1)
+        lambda row: row['project_name'], axis=1)
     
     # Define the color map for each passport category
     colors = {'missing': 'lightgrey', '0 to 5': 'lightcoral', '5 to 15': 'lightblue', '15+': 'lightgreen'}
@@ -470,15 +466,16 @@ with onchain_metrics:
                  orientation='h',
                  labels={'percentage': 'Percentage', 'project_name_with_transactions': 'Project Name'},
                  height=400 + len(category_distribution_percentage_long['project_name'].unique()) * 20,
-                 custom_data=['total_transactions', 'passport_category'])
+                 custom_data=['passport_category'])
     
-    # Update the layout to include hovertemplate
-    fig.update_traces(hovertemplate='<b>%{y}</b><br>Score: %{customdata[1]}<br>Percentage: %{x:.2f}%<br>Total transactions: %{customdata[0]}')
+    # Update the layout to include hovertemplate (without total_transactions)
+    fig.update_traces(hovertemplate='<b>%{y}</b><br>Score: %{customdata[0]}<br>Percentage: %{x:.2f}%')
     
     # Show the plot
     st.markdown("This chart shows the percentage of transactions for each project categorized by users' passport scores. Projects are sorted by the absolute count of high scores ('15+') first, followed by mid-range scores ('5 to 15'), lower scores ('0 to 5'), and missing data.")
-    st.caption("Hover over the chart to see the count of transactions")
+    st.caption("Hover over the chart to see the category and percentage.")
     st.plotly_chart(fig, use_container_width=True)
+
     
 
 with integrated_view:
