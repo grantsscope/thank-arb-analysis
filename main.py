@@ -435,69 +435,44 @@ with onchain_metrics:
         unique_transaction_count=('transaction_hash', 'nunique')
     ).reset_index()
 
+    # Group by project_name and passport_category, then count occurrences
+    category_counts = aggregated_df.groupby(['project_name', 'passport_category']).size().reset_index(name='count')
+    
+    # Pivot the DataFrame to get categories as columns
+    pivot_df = category_counts.pivot(index='project_name', columns='passport_category', values='count').fillna(0)
+    
     # Calculate total transactions for each project
-    aggregated_df['total_transactions'] = (
-        aggregated_df['missing'] +
-        aggregated_df['0_to_5'] +
-        aggregated_df['5_to_15'] +
-        aggregated_df['15+']
-    )
+    pivot_df['total_transactions'] = pivot_df.sum(axis=1)
     
     # Calculate percentage shares
-    aggregated_df['percent_missing'] = (aggregated_df['missing'] / aggregated_df['total_transactions']) * 100
-    aggregated_df['percent_0_to_5'] = (aggregated_df['0_to_5'] / aggregated_df['total_transactions']) * 100
-    aggregated_df['percent_5_to_15'] = (aggregated_df['5_to_15'] / aggregated_df['total_transactions']) * 100
-    aggregated_df['percent_greater_than_15'] = (aggregated_df['15+'] / aggregated_df['total_transactions']) * 100
+    for category in pivot_df.columns[:-1]:  # Exclude 'total_transactions'
+        pivot_df[f'percent_{category}'] = (pivot_df[category] / pivot_df['total_transactions']) * 100
     
     # Create the stacked bar chart
     fig = go.Figure()
     
     # Add traces for each category
-    fig.add_trace(go.Bar(
-        y=aggregated_df['project_name'],
-        x=aggregated_df['percent_missing'],
-        name='Score Missing',
-        orientation='h',
-        marker=dict(color='gray'),
-    ))
-    
-    fig.add_trace(go.Bar(
-        y=aggregated_df['project_name'],
-        x=aggregated_df['percent_0_to_5'],
-        name='Score 0 to 5',
-        orientation='h',
-        marker=dict(color='red'),
-    ))
-    
-    fig.add_trace(go.Bar(
-        y=aggregated_df['project_name'],
-        x=aggregated_df['percent_5_to_15'],
-        name='Score 5 to 15',
-        orientation='h',
-        marker=dict(color='yellow'),
-    ))
-    
-    fig.add_trace(go.Bar(
-        y=aggregated_df['project_name'],
-        x=aggregated_df['percent_greater_than_15'],
-        name='Score > 15',
-        orientation='h',
-        marker=dict(color='green'),
-    ))
+    for category in pivot_df.columns[:-1]:  # Exclude 'total_transactions'
+        fig.add_trace(go.Bar(
+            y=pivot_df.index,
+            x=pivot_df[f'percent_{category}'],
+            name=category,
+            orientation='h',
+            marker=dict(color='gray' if category == 'missing' else 'red' if category == '0 to 5' else 'yellow' if category == '5 to 15' else 'green'),
+        ))
     
     # Update layout
     fig.update_layout(
-        title='Share of Transactions by Passport Score',
+        title='Share of Transactions by Passport Score Category',
         barmode='stack',
         yaxis_title='Project Name',
         xaxis_title='Percentage (%)',
         xaxis=dict(tickformat=',.0%', range=[0, 100]),
-        height=max(600, len(aggregated_df) * 25),  # Adjust height based on number of projects
+        height=max(600, len(pivot_df) * 25),  # Adjust height based on number of projects
     )
     
     # Display the chart in Streamlit
     st.plotly_chart(fig, use_container_width=True)
-
 
 with integrated_view:
 
