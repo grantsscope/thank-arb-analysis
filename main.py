@@ -459,12 +459,11 @@ with onchain_metrics:
                  orientation='h',
                  title='Distribution of Transactions by Passport Category for Each Project (in %)',
                  labels={'percentage': 'Percentage', 'project_name': 'Project Name'},
-                 height=400 + len(category_distribution_percentage_long['project_name'].unique()) * 50,
-                 custom_data=['total_transactions'])
+                 height=400 + len(category_distribution_percentage_long['project_name'].unique()) * 20,
+                 custom_data=['total_transactions', 'passport_category'])
     
-    # Update the layout to include the total number of transactions in the hover data
-    fig.update_traces(hovertemplate='<b>%{y}</b><br>Category: %{color}<br>Percentage: %{x:.2f}%<br>Total transactions: %{customdata[0]}')
-
+    # Update the layout to include the correct passport category and total number of transactions in the hover data
+    fig.update_traces(hovertemplate='<b>%{y}</b><br>Category: %{customdata[1]}<br>Percentage: %{x:.2f}%<br>Total transactions: %{customdata[0]}')
     
     # Show the plot
     st.plotly_chart(fig, use_container_width=True)
