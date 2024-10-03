@@ -437,17 +437,17 @@ with onchain_metrics:
 
     # Calculate total transactions for each project
     aggregated_df['total_transactions'] = (
-        aggregated_df['score_missing'] +
-        aggregated_df['score_0_to_5'] +
-        aggregated_df['score_5_to_15'] +
-        aggregated_df['score_greater_than_15']
+        aggregated_df['missing'] +
+        aggregated_df['0_to_5'] +
+        aggregated_df['5_to_15'] +
+        aggregated_df['15+']
     )
     
     # Calculate percentage shares
-    aggregated_df['percent_missing'] = (aggregated_df['score_missing'] / aggregated_df['total_transactions']) * 100
-    aggregated_df['percent_0_to_5'] = (aggregated_df['score_0_to_5'] / aggregated_df['total_transactions']) * 100
-    aggregated_df['percent_5_to_15'] = (aggregated_df['score_5_to_15'] / aggregated_df['total_transactions']) * 100
-    aggregated_df['percent_greater_than_15'] = (aggregated_df['score_greater_than_15'] / aggregated_df['total_transactions']) * 100
+    aggregated_df['percent_missing'] = (aggregated_df['missing'] / aggregated_df['total_transactions']) * 100
+    aggregated_df['percent_0_to_5'] = (aggregated_df['0_to_5'] / aggregated_df['total_transactions']) * 100
+    aggregated_df['percent_5_to_15'] = (aggregated_df['5_to_15'] / aggregated_df['total_transactions']) * 100
+    aggregated_df['percent_greater_than_15'] = (aggregated_df['15+'] / aggregated_df['total_transactions']) * 100
     
     # Create the stacked bar chart
     fig = go.Figure()
