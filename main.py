@@ -415,7 +415,7 @@ with onchain_metrics:
     
     # Show categorization by Passport Score
 
-    st.markdown("### Transaction Count by Passport Score")
+    st.markdown("### Distribution of Transactions by Passport Score")
     # Categorize the 'passport_score' into the desired groups
     def categorize_passport_score(score):
         if pd.isna(score):
@@ -475,15 +475,16 @@ with onchain_metrics:
                  color_discrete_map=colors,
                  category_orders={'passport_category': category_order},
                  orientation='h',
-                 title='Distribution of Transactions by Passport Category for Each Project (in %)',
                  labels={'percentage': 'Percentage', 'project_name': 'Project Name'},
                  height=400 + len(category_distribution_percentage_long['project_name'].unique()) * 20,
                  custom_data=['total_transactions', 'passport_category'])
     
     # Update the layout to include the correct passport category and total number of transactions in the hover data
-    fig.update_traces(hovertemplate='<b>%{y}</b><br>Category: %{customdata[1]}<br>Percentage: %{x:.2f}%<br>Total transactions: %{customdata[0]}')
+    fig.update_traces(hovertemplate='<b>%{y}</b><br>Score: %{customdata[1]}<br>Percentage: %{x:.2f}%<br>Total transactions: %{customdata[0]}')
     
     # Show the plot
+    st.markdown("This chart shows the percentage of transactions for each project categorized by users' passport scores. Projects are sorted by the percentage of high scores ('15+') first, followed by mid-range scores ('5 to 15'), lower scores ('0 to 5'), and missing data.")
+    st.caption("Hover over the chart to see the count of transactions")
     st.plotly_chart(fig, use_container_width=True)
 
     
