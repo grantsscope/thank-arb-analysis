@@ -417,7 +417,7 @@ with onchain_metrics:
     st.markdown("### Distribution of Transactions by Passport Score and Farcaster User Accounts (April - September 2024)")
     st.markdown("The bars represent each project's percentage of transactions in the different passport score categories, \
                 allowing for an easy comparison across projects. Each project name is also suffixed with the number of transactions \
-                that involved users with a Farcaster account, displayed as a ratio of transactions with Farcaster users to the total transactions.)
+                that involved users with a Farcaster account, displayed as a ratio of transactions with Farcaster users to the total transactions.")
     
     onchain_data_detail_farcaster = pd.read_csv("./data/Transaction Detail with Farcaster.csv")
 
