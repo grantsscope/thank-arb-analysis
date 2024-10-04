@@ -470,11 +470,9 @@ with onchain_metrics:
     category_order = ['Passport Score Missing', 'Passport Score < 5', 'Passport Score 5-15', 'Passport Score 15+']
     colors = {'Passport Score Missing': 'lightgrey', 'Passport Score < 5': 'lightcoral', 'Passport Score 5-15': 'lightblue', 'Passport Score 15+': 'lightgreen'}
     
-    #passport_score_df = passport_score_df.sort_values(by=['Percentage'],ascending=[False])
-    
-    #passport_score_df = passport_score_df.sort_values(by=['Passport Score 15+','Passport Score 5-15','Passport Score 0-5','Passport Score Missing'],
-    #        ascending=[True, True, True, True])
-    
+    # Rounding the percentage values to whole numbers
+    passport_score_df['Percentage'] = passport_score_df['Percentage'].round(0)
+
     # Creating a horizontal stacked bar chart using Plotly Express
     fig = px.bar(
         passport_score_df,
