@@ -414,7 +414,11 @@ with onchain_metrics:
     st.plotly_chart(fig, use_container_width=True)
     
     # Show categorization by Passport Score
-    st.markdown("### Distribution of Transactions by Passport Score")
+    st.markdown("### Distribution of Transactions by Passport Score and Farcaster User Accounts (April - September 2024)")
+    st.markdown("The bars represent each project's percentage of transactions in the different passport score categories, \
+                allowing for an easy comparison across projects. Each project name is also suffixed with the number of transactions \
+                that involved users with a Farcaster account, displayed as a ratio of transactions with Farcaster users to the total transactions.)
+    
     onchain_data_detail_farcaster = pd.read_csv("./data/Transaction Detail with Farcaster.csv")
 
     onchain_merge = pd.merge(onchain_data_detail, onchain_data_detail_farcaster[['transaction_hash', 'farcaster_username']],
@@ -487,7 +491,7 @@ with integrated_view:
 
     # User-friendly explanation
     st.markdown("""
-    ### Understanding the Project Comparison Chart
+    ### Understanding the Project Comparison Chart (April - September 2024)
 
     This chart compares projects based on two key metrics:
     - **Development Activity Index**: Measures the coding activity of a project.
