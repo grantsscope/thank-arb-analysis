@@ -421,8 +421,12 @@ with onchain_metrics:
     
     onchain_data_detail_farcaster = pd.read_csv("./data/Transaction Detail with Farcaster.csv")
 
-    onchain_merge = pd.merge(onchain_data_detail, onchain_data_detail_farcaster[['transaction_hash', 'farcaster_username']],
-                     on='transaction_hash', how='left')
+    onchain_merge = pd.merge(
+        onchain_data_detail, 
+        onchain_data_detail_farcaster[['transaction_hash', 'farcaster_username', 'to_address', 'from_address','artifact_name']],
+        on=['transaction_hash', 'to_address', 'from_address','artifact_name'], 
+        how='left'
+    )
 
     onchain_merge = onchain_merge.drop_duplicates()
 
