@@ -424,6 +424,8 @@ with onchain_metrics:
     onchain_merge = pd.merge(onchain_data_detail, onchain_data_detail_farcaster[['transaction_hash', 'farcaster_username']],
                      on='transaction_hash', how='left')
 
+    onchain_merge = onchain_merge.drop_duplicates()
+
     aggregate_df = onchain_merge.groupby('project_name').agg(
         total_transactions=('transaction_hash', 'count'),
         transaction_with_farcaster_name=('farcaster_username', lambda x: x.notna().sum()),
