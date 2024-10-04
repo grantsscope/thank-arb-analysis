@@ -414,86 +414,74 @@ with onchain_metrics:
     st.plotly_chart(fig, use_container_width=True)
     
     # Show categorization by Passport Score
-
     st.markdown("### Distribution of Transactions by Passport Score")
-    def categorize_passport_score(score):
-        if pd.isna(score):
-            return 'missing'
-        elif score <= 5:
-            return '0 to 5'
-        elif score <= 15:
-            return '5 to 15'
-        else:
-            return '15+'
+    onchain_data_detail_farcaster = pd.read_csv("./data/Transaction Detail with Farcaster.csv")
+
+    onchain_merge = pd.merge(onchain_data_detail, onchain_data_detail_farcaster[['transaction_hash', 'farcaster_username']],
+                     on='transaction_hash', how='left')
+
+    aggregate_df = onchain_merge.groupby('project_name').agg(
+        total_transactions=('transaction_hash', 'count'),
+        transaction_with_farcaster_name=('farcaster_username', lambda x: x.notna().sum()),
+        missing_passport_score=('passport_score', lambda x: x.isna().sum()),
+        passport_score_between_0_and_5=('passport_score', lambda x: ((x >= 0) & (x <= 5)).sum()),
+        passport_score_between_5_and_15=('passport_score', lambda x: ((x > 5) & (x <= 15)).sum()),
+        passport_score_above_15=('passport_score', lambda x: (x > 15).sum())
+    ).reset_index()
     
-    # Apply the categorization function to the 'passport_score' column
-    onchain_data_detail['passport_category'] = onchain_data_detail['passport_score'].apply(categorize_passport_score)
+    # Updating the project_name column by appending the ratio of transaction_with_farcaster_name / total_transactions
+    aggregate_df['project_name'] = aggregate_df.apply(
+        lambda row: f"{row['project_name']} ({row['transaction_with_farcaster_name']}/{row['total_transactions']})", axis=1
+    )
 
-    # Calculate the percentage distribution of transactions by category for each project
-    category_distribution = onchain_data_detail.groupby(['project_name', 'passport_category']).size().unstack(fill_value=0)
-    category_distribution_percentage = category_distribution.div(category_distribution.sum(axis=1), axis=0) * 100
-
-    # Define the order of categories and colors
-    category_order = ['missing', '0 to 5', '5 to 15', '15+']
-    colors = {'missing': 'lightgrey', '0 to 5': 'lightcoral', '5 to 15': 'lightblue', '15+': 'lightgreen'}
-
-    # Calculate total transactions for each project
-    # total_transactions = onchain_data_detail.groupby(['project_name', 'passport_category']).size().unstack(fill_value=0)
-    category_distribution_percentage_long = category_distribution_percentage.reset_index().melt(id_vars='project_name', var_name='passport_category', value_name='percentage')
-    category_distribution_percentage_long['total_transactions'] = category_distribution_percentage_long.apply(
-        lambda row: category_distribution.loc[row['project_name'], row['passport_category']], axis=1
+    aggregate_df['pct_missing'] = (aggregate_df['missing_passport_score'] / aggregate_df['total_transactions']) * 100
+    aggregate_df['pct_0_5'] = (aggregate_df['passport_score_between_0_and_5'] / aggregate_df['total_transactions']) * 100
+    aggregate_df['pct_5_15'] = (aggregate_df['passport_score_between_5_and_15'] / aggregate_df['total_transactions']) * 100
+    aggregate_df['pct_15_plus'] = (aggregate_df['passport_score_above_15'] / aggregate_df['total_transactions']) * 100
+    
+    aggregate_df=aggregate_df.sort_values(by=['pct_15_plus','pct_5_15','pct_0_5','pct_missing'],ascending=[True,True,True,True])
+    
+    # Reshaping the DataFrame for Plotly Express
+    passport_score_df = aggregate_df.melt(
+        id_vars='project_name',
+        value_vars=['pct_missing','pct_0_5', 'pct_5_15', 'pct_15_plus'],
+        var_name='Passport Score Range',
+        value_name='Percentage'
     )
     
-    # Add the sort values for each category
-    category_distribution_percentage_long['15_plus_percentage'] = category_distribution_percentage_long.apply(
-        lambda row: category_distribution_percentage.loc[row['project_name'], '15+'], axis=1)
+    # Renaming the passport score range for clarity
+    passport_score_df['Passport Score Range'] = passport_score_df['Passport Score Range'].replace({
+        'pct_missing': 'Passport Score Missing',
+        'pct_0_5': 'Passport Score < 5',
+        'pct_5_15': 'Passport Score 5-15',
+        'pct_15_plus': 'Passport Score 15+'
+    })
     
-    category_distribution_percentage_long['5_to_15_percentage'] = category_distribution_percentage_long.apply(
-        lambda row: category_distribution_percentage.loc[row['project_name'], '5 to 15'], axis=1)
+    category_order = ['Passport Score Missing', 'Passport Score < 5', 'Passport Score 5-15', 'Passport Score 15+']
+    colors = {'Passport Score Missing': 'lightgrey', 'Passport Score < 5': 'lightcoral', 'Passport Score 5-15': 'lightblue', 'Passport Score 15+': 'lightgreen'}
     
-    category_distribution_percentage_long['0_to_5_percentage'] = category_distribution_percentage_long.apply(
-        lambda row: category_distribution_percentage.loc[row['project_name'], '0 to 5'], axis=1)
+    #passport_score_df = passport_score_df.sort_values(by=['Percentage'],ascending=[False])
     
-    category_distribution_percentage_long['missing_percentage'] = category_distribution_percentage_long.apply(
-        lambda row: category_distribution_percentage.loc[row['project_name'], 'missing'], axis=1)
+    #passport_score_df = passport_score_df.sort_values(by=['Passport Score 15+','Passport Score 5-15','Passport Score 0-5','Passport Score Missing'],
+    #        ascending=[True, True, True, True])
     
+    # Creating a horizontal stacked bar chart using Plotly Express
+    fig = px.bar(
+        passport_score_df,
+        x='Percentage',
+        y='project_name',
+        color='Passport Score Range',
+        color_discrete_map=colors,
+        category_orders={'Passport Score Range': category_order},
+        orientation='h',
+        height=400 + len(passport_score_df['project_name'].unique()) * 20,
+        labels={'project_name': 'Project Name', 'Percentage': 'Percentage (%)'}
+    )
     
-    # Sort by 15+ first, then 5 to 15, then 0 to 5, and finally missing
-    category_distribution_percentage_long = category_distribution_percentage_long.sort_values(
-        by=['15_plus_percentage', '5_to_15_percentage', '0_to_5_percentage', 'missing_percentage'],
-        ascending=[True, True, True, True])
+    # Adjusting layout for better readability
+    fig.update_layout(barmode='stack')
     
-    # Define the order of categories and colors
-    category_order = ['missing', '0 to 5', '5 to 15', '15+']
-    colors = {'missing': 'lightgrey', '0 to 5': 'lightcoral', '5 to 15': 'lightblue', '15+': 'lightgreen'}
-    
-    # Concatenate project names with total transactions
-    category_distribution_percentage_long['project_name_with_transactions'] = category_distribution_percentage_long.apply(
-        lambda row: f"{row['project_name']} (Total: {category_distribution.loc[row['project_name']].sum()})", axis=1)
-    
-    # Create the horizontal bar chart using Plotly with specified order and colors
-    fig = px.bar(category_distribution_percentage_long, 
-                 x='percentage', 
-                 y='project_name_with_transactions',  # Updated y-axis to include total transactions
-                 color='passport_category', 
-                 color_discrete_map=colors,
-                 category_orders={'passport_category': category_order},
-                 orientation='h',
-                 labels={'percentage': 'Percentage', 'project_name_with_transactions': 'Project Name'},
-                 height=400 + len(category_distribution_percentage_long['project_name'].unique()) * 20,
-                 custom_data=['total_transactions', 'passport_category'])
-    
-    # Update the layout to include the correct passport category and total number of transactions in the hover data
-    fig.update_traces(hovertemplate='<b>%{y}</b><br>Score: %{customdata[1]}<br>Percentage: %{x:.2f}%<br>Total transactions: %{customdata[0]}')
-    
-    # Show the plot
-    st.markdown("This chart shows the percentage of transactions for each project categorized by users' passport scores. Projects are sorted by the percentage of high scores ('15+') first, followed by mid-range scores ('5 to 15'), lower scores ('0 to 5'), and missing data.")
-    st.caption("Hover over the chart to see the count of transactions")
-    st.plotly_chart(fig)
-
-    
-
-    
+    st.plotly_chart(fig, use_container_width=True)
 
 with integrated_view:
 
